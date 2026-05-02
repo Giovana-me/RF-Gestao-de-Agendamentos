@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import ProcedimentosView from '../views/ProcedimentosView.vue'
 import HomeView from '../views/HomeView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,5 +21,13 @@ const router = createRouter({
     },
   ],
 })
+
+const routes = [
+  {
+    path: "/procedimentos",
+    name: "procedimentos",
+    component: ProcedimentosView
+  }
+];
 
 export default router
