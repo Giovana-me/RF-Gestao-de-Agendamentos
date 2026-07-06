@@ -69,6 +69,28 @@ public class SolicitacaoService {
                 .orElseThrow(() -> new RuntimeException("Solicitação não encontrada"));
     }
 
+    public Solicitacao remarcar(
+            Long id,
+            String dataDesejada,
+            String horaDesejada,
+            String observacao
+    ) {
+
+        Solicitacao solicitacao = buscarPorId(id);
+
+        if (solicitacao.getStatus() != StatusSolicitacao.PENDENTE) {
+            throw new RuntimeException(
+                    "Somente solicitações pendentes podem ser remarcadas"
+            );
+        }
+
+        solicitacao.setDataDesejada(dataDesejada);
+        solicitacao.setHoraDesejada(horaDesejada);
+        solicitacao.setObservacao(observacao);
+
+        return solicitacaoRepository.save(solicitacao);
+    }
+
     public Solicitacao aprovar(Long id) {
         Solicitacao solicitacao = buscarPorId(id);
 
@@ -99,6 +121,17 @@ public class SolicitacaoService {
 
         if (solicitacao.getStatus() != StatusSolicitacao.PENDENTE) {
             throw new RuntimeException("Apenas solicitações pendentes podem ser recusadas");
+        }
+
+        solicitacao.setStatus(StatusSolicitacao.RECUSADA);
+        return solicitacaoRepository.save(solicitacao);
+    }
+
+    public Solicitacao cancelar(Long id) {
+        Solicitacao solicitacao = buscarPorId(id);
+
+        if (solicitacao.getStatus() != StatusSolicitacao.PENDENTE) {
+            throw new RuntimeException("Apenas solicitações pendentes podem ser canceladas");
         }
 
         solicitacao.setStatus(StatusSolicitacao.RECUSADA);

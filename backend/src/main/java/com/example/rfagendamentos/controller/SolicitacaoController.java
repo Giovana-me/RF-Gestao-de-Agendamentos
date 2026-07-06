@@ -1,5 +1,6 @@
 package com.example.rfagendamentos.controller;
 
+import com.example.rfagendamentos.dto.RemarcacaoDTO;
 import com.example.rfagendamentos.model.Solicitacao;
 import com.example.rfagendamentos.service.SolicitacaoService;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,20 @@ public class SolicitacaoController {
         return solicitacaoService.listarPorCliente(clienteId);
     }
 
+    @PutMapping("/{id}/remarcar")
+    public Solicitacao remarcar(
+            @PathVariable Long id,
+            @RequestBody RemarcacaoDTO dto
+    ) {
+
+        return solicitacaoService.remarcar(
+                id,
+                dto.getDataDesejada(),
+                dto.getHoraDesejada(),
+                dto.getObservacao()
+        );
+    }
+
     @PatchMapping("/{id}/aprovar")
     public Solicitacao aprovar(@PathVariable Long id) {
         return solicitacaoService.aprovar(id);
@@ -49,5 +64,10 @@ public class SolicitacaoController {
     @PatchMapping("/{id}/recusar")
     public Solicitacao recusar(@PathVariable Long id) {
         return solicitacaoService.recusar(id);
+    }
+
+    @PatchMapping("/{id}/cancelar")
+    public Solicitacao cancelar(@PathVariable Long id) {
+        return solicitacaoService.cancelar(id);
     }
 }
