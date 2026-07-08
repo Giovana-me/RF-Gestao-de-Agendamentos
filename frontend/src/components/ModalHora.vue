@@ -21,7 +21,7 @@
           :class="{ selected: horaSelecionada === hora }"
           @click="horaSelecionada = hora"
         >
-          ⏱ {{ hora }}
+          {{ hora }}
         </button>
       </div>
 
@@ -130,9 +130,9 @@ function continuar() {
   padding: 22px;
   font-size: 22px;
   cursor: pointer;
-  box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.22),
-    inset 0 3px 5px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.22);
+  display: flex;
+  justify-content: center;
 }
 
 .time-button.selected {
