@@ -9,14 +9,33 @@
       </div>
     </div>
 
-    <button class="cliente-logout-button">
+    <button
+      class="cliente-logout-button"
+      @click="realizarLogout"
+    >
       Sair
     </button>
   </header>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
 
-const nomeUsuario = ref("Maria Silva"); // depois vem do login
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { getUsuarioLogado, logout } from "../services/authService";
+
+const router = useRouter();
+const nomeUsuario = ref("");
+
+onMounted(() => {
+    const usuario = getUsuarioLogado();
+    if (usuario) {
+        nomeUsuario.value = usuario.nome;
+    }
+});
+
+function realizarLogout() {
+    logout();
+    router.push("/login");
+}
 </script>
