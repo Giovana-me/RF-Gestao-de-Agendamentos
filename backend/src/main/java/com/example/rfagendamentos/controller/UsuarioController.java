@@ -1,5 +1,6 @@
 package com.example.rfagendamentos.controller;
 
+import com.example.rfagendamentos.dto.AtualizarContaDTO;
 import com.example.rfagendamentos.model.Usuario;
 import com.example.rfagendamentos.service.UsuarioService;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +33,8 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public Usuario atualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
-        return usuarioService.atualizar(id, usuario);
+    public Usuario atualizarConta(@PathVariable Long id, @RequestBody AtualizarContaDTO usuario) {
+        return usuarioService.atualizarConta(id, usuario);
     }
 
     @DeleteMapping("/{id}")

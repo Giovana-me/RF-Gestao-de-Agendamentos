@@ -1,5 +1,6 @@
 package com.example.rfagendamentos.service;
 
+import com.example.rfagendamentos.dto.AtualizarContaDTO;
 import com.example.rfagendamentos.model.TipoUsuario;
 import com.example.rfagendamentos.model.Usuario;
 import com.example.rfagendamentos.repository.UsuarioRepository;
@@ -42,13 +43,11 @@ public class UsuarioService {
         return usuarioRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
     }
 
-    public Usuario atualizar(Long id, Usuario dadosAtualizados) {
+    public Usuario atualizarConta(Long id, AtualizarContaDTO dadosAtualizados) {
         Usuario usuario = buscarPorId(id);
 
         usuario.setNome(dadosAtualizados.getNome());
-        usuario.setEmail(dadosAtualizados.getEmail());
         usuario.setTelefone(dadosAtualizados.getTelefone());
-        usuario.setCpf(dadosAtualizados.getCpf());
         usuario.setEndereco(dadosAtualizados.getEndereco());
 
         return usuarioRepository.save(usuario);

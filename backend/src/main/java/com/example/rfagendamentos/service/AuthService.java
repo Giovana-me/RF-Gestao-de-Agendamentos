@@ -39,6 +39,8 @@ public class AuthService {
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
+                usuario.getTelefone(),
+                usuario.getEndereco(),
                 usuario.getTipoUsuario(),
                 token
         );
