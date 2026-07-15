@@ -57,7 +57,7 @@
 <script setup>
 import { computed, ref } from "vue";
 
-import Stepper from "./Stepper.vue";
+import Stepper from "../Stepper.vue";
 
 const props = defineProps({
   procedimento: {
@@ -107,7 +107,8 @@ function finalizar() {
 }
 
 .modal-box {
-  width: 760px;
+  width: 800px;
+  height: 800px;
   background-color: #fff;
   border-radius: 30px;
   padding: 36px;
@@ -115,6 +116,8 @@ function finalizar() {
   position: relative;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
   color: #000;
+  display: flex;
+  flex-direction: column;
 }
 
 .close-button {
@@ -133,6 +136,7 @@ function finalizar() {
   font-size: 26px;
   font-weight: 700;
   color: #000;
+  padding: 20px;
 }
 
 .details {
@@ -180,11 +184,18 @@ textarea::placeholder {
 .back-button,
 .finish-button {
   border: none;
-  border-radius: 24px;
-  padding: 16px;
-  font-size: 16px;
+  border-radius: 26px;
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.18);
+  font-size: 16px;
+  width: 100%;
+  gap:10px;
+  margin-top: 25px;
+  height: 50px;
+}
+
+.back-button:hover {
+  background:#94335c;
+  color:white;
 }
 
 .back-button {
@@ -192,8 +203,13 @@ textarea::placeholder {
   color: #000;
 }
 
+.finish-button:hover {
+  background:#94335c;
+  color:white;
+}
+
 .finish-button {
-  background-color: #e8b5d5;
-  color: #000;
+  background-color: #dd81b5;
+  color: white;
 }
 </style>

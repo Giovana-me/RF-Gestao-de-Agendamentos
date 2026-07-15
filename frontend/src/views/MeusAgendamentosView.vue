@@ -188,11 +188,12 @@
 import ClienteLayout from "@/components/ClienteLayout.vue";
 import { ref, onMounted, computed } from "vue";
 import api from "@/services/api";
-import ModalData from "@/components/ModalData.vue";
-import ModalHora from "@/components/ModalHora.vue";
-import ModalDetalhes from "@/components/ModalDetalhes.vue";
-
-const clienteId = ref(1);
+import ModalData from "@/components/modals/ModalData.vue";
+import ModalHora from "@/components/modals/ModalHora.vue";
+import ModalDetalhes from "@/components/modals/ModalDetalhes.vue";
+import { useToast } from "vue-toastification";
+import { getUsuarioLogado } from "@/services/authService";
+import { getUsuarioAutenticadoOuErro } from "@/services/authService";
 
 const solicitacoes = ref([]);
 const solicitacoesAtivas = computed(() =>
@@ -208,21 +209,20 @@ const solicitacoesCanceladas = computed(() =>
 );
 const carregando = ref(true);
 const erro = ref("");
-
 const mostrarModalData = ref(false);
 const mostrarModalHora = ref(false);
 const mostrarModalDetalhes = ref(false);
-
 const solicitacaoSelecionada = ref(null);
-
 const dataSelecionada = ref("");
 const horaSelecionada = ref("");
+const toast = useToast();
 
 async function carregarSolicitacoes() {
+  const usuarioLogado = getUsuarioAutenticadoOuErro();
   try {
     carregando.value = true;
 
-    const response = await api.get(`/solicitacoes/cliente/${clienteId.value}`);
+    const response = await api.get(`/solicitacoes/cliente/${usuarioLogado.id}`);
     solicitacoes.value = response.data;
   } catch (error) {
     console.error(error);
@@ -244,7 +244,7 @@ async function cancelarSolicitacao(id) {
     await carregarSolicitacoes();
   } catch (error) {
     console.error(error);
-    alert("Não foi possível cancelar a solicitação.");
+    toast.error("Não foi possível cancelar a solicitação.");
   }
 }
 
@@ -320,16 +320,12 @@ async function finalizarRemarcacao(observacao) {
     );
 
     mostrarModalDetalhes.value = false;
-
     await carregarSolicitacoes();
-
-    alert("Solicitação remarcada com sucesso!");
+    toast.success("Solicitação remarcada com sucesso!");
 
   } catch (error) {
-
     console.error(error);
-
-    alert("Não foi possível remarcar.");
+    toast.error("Não foi possível remarcar.");
 
   }
 }

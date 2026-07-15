@@ -40,9 +40,10 @@
 
 <script setup>
 import { ref } from "vue";
+import Stepper from "../Stepper.vue";
+import { useToast } from "vue-toastification";
 
-import Stepper from "./Stepper.vue";
-
+const toast = useToast();
 const emit = defineEmits(["fechar", "voltar", "continuar"]);
 
 const horarios = [
@@ -62,7 +63,7 @@ const horaSelecionada = ref("");
 
 function continuar() {
   if (!horaSelecionada.value) {
-    alert("Selecione um horário para continuar.");
+    toast.info("Selecione um horário para continuar.");
     return;
   }
 
@@ -82,7 +83,8 @@ function continuar() {
 }
 
 .modal-box {
-  width: 760px;
+  width: 800px;
+  height: 800px;
   background-color: #fff;
   border-radius: 30px;
   padding: 36px;
@@ -90,6 +92,8 @@ function continuar() {
   position: relative;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
   color: #000;
+  display: flex;
+  flex-direction: column;
 }
 
 .close-button {
@@ -108,6 +112,7 @@ function continuar() {
   font-size: 28px;
   font-weight: 700;
   color: #000;
+  padding: 20px;
 }
 
 .subtitle {
@@ -127,8 +132,8 @@ function continuar() {
   background-color: #fff;
   color: #000;
   border-radius: 12px;
-  padding: 22px;
-  font-size: 22px;
+  padding: 15px;
+  font-size: 16px;
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.22);
   display: flex;
@@ -136,8 +141,8 @@ function continuar() {
 }
 
 .time-button.selected {
-  background-color: #dd81b5;
-  color: #fff;
+  background-color: #94335c;
+  color: white;
 }
 
 .actions {
@@ -150,19 +155,32 @@ function continuar() {
 .back-button,
 .next-button {
   border: none;
-  border-radius: 24px;
-  padding: 16px;
-  font-size: 16px;
+  border-radius: 26px;
   cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  gap:10px;
+  margin-top: 25px;
+  height: 50px;
+}
+
+.back-button:hover {
+  background:#94335c;
+  color:white;
 }
 
 .back-button {
   background-color: #ffeeee;
-  color: #000;
+  color: black;
+}
+
+.next-button:hover {
+  background:#94335c;
+  color:white;
 }
 
 .next-button {
   background-color: #dd81b5;
-  color: #fff;
+  color: white;
 }
 </style>

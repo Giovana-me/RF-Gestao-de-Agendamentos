@@ -35,27 +35,26 @@
 
 <script setup>
 import { ref } from "vue";
+import Stepper from "../Stepper.vue";
+import { useToast } from "vue-toastification";
 
-import Stepper from "./Stepper.vue";
+const toast = useToast();
 
 const hoje = new Date();
-
 const dataMinima = hoje.toISOString().split("T")[0];
-
 const emit = defineEmits(["fechar", "continuar"]);
-
 const dataSelecionada = ref("");
 
 function continuar() {
   if (!dataSelecionada.value) {
-    alert("Selecione uma data para continuar.");
+    toast.info("Selecione uma data para continuar.");
     return;
   }
 
   const data = new Date(dataSelecionada.value + "T00:00:00");
 
   if (data.getDay() === 0) {
-    alert("Não realizamos atendimentos aos domingos.");
+    toast.info("Não realizamos atendimentos aos domingos.");
     return;
   }
 
@@ -75,14 +74,17 @@ function continuar() {
 }
 
 .modal-box {
-  width: 760px;
+  width: 800px;
+  height: 600px;
   background-color: #fff;
   border-radius: 30px;
-  padding: 36px;
+  padding: 50px;
   box-sizing: border-box;
   position: relative;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
   color: #000;
+  display: flex;
+  flex-direction: column;
 }
 
 .close-button {
@@ -101,12 +103,14 @@ function continuar() {
   font-size: 28px;
   font-weight: 700;
   color: #000;
+  padding: 20px;
 }
 
 .subtitle {
   margin: 12px 0 28px;
   font-size: 18px;
   color: #000;
+  padding: 20px;
 }
 
 .date-input {
@@ -129,15 +133,28 @@ function continuar() {
 .back-button,
 .next-button {
   border: none;
-  border-radius: 24px;
-  padding: 16px;
-  font-size: 16px;
+  border-radius: 26px;
   cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  gap:10px;
+  margin-top: 25px;
+  height: 50px;
+}
+
+.back-button:hover{
+  background:#94335c;
+  color:white;
+}
+
+.next-button:hover {
+  background:#94335c;
+  color:white;
 }
 
 .back-button {
   background-color: #ffeeee;
-  color: #000;
+  color: black;
 }
 
 .next-button {

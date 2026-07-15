@@ -70,21 +70,21 @@
 import ClienteLayout from "@/components/ClienteLayout.vue";
 import { ref, onMounted, computed } from "vue";
 import api from "@/services/api";
-import ModalData from "@/components/ModalData.vue";
-import ModalHora from "@/components/ModalHora.vue";
-import ModalDetalhes from "@/components/ModalDetalhes.vue";
+import ModalData from "@/components/modals/ModalData.vue";
+import ModalHora from "@/components/modals/ModalHora.vue";
+import ModalDetalhes from "@/components/modals/ModalDetalhes.vue";
 import Stepper from "@/components/Stepper.vue";
+import { useToast } from "vue-toastification";
+import { getUsuarioLogado } from "@/services/authService";
+import { getUsuarioAutenticadoOuErro } from "@/services/authService";
 
+const toast = useToast();
 const mostrarModalData = ref(false);
 const procedimentoSelecionado = ref(null);
 const dataSelecionada = ref("");
-
 const mostrarModalHora = ref(false);
 const horaSelecionada = ref("");
-
 const mostrarModalDetalhes = ref(false);
-const clienteId = ref(1);
-
 const procedimentos = ref([]);
 const carregando = ref(true);
 const erro = ref("");
@@ -155,6 +155,7 @@ function voltarParaHora() {
 }
 
 async function finalizarSolicitacao(observacao) {
+  const usuarioLogado = getUsuarioAutenticadoOuErro();
   try {
     const novaSolicitacao = {
       dataDesejada: dataSelecionada.value,
@@ -162,7 +163,7 @@ async function finalizarSolicitacao(observacao) {
       observacao: observacao,
       tipoSolicitacao: "NOVO_AGENDAMENTO",
       cliente: {
-        id: clienteId.value
+        id: usuarioLogado.id
       },
       procedimento: {
         id: procedimentoSelecionado.value.id
@@ -171,7 +172,7 @@ async function finalizarSolicitacao(observacao) {
 
     await api.post("/solicitacoes", novaSolicitacao);
 
-    alert("Solicitação enviada com sucesso!");
+    toast.success("Solicitação enviada com sucesso!");
 
     mostrarModalDetalhes.value = false;
     procedimentoSelecionado.value = null;
@@ -179,7 +180,7 @@ async function finalizarSolicitacao(observacao) {
     horaSelecionada.value = "";
   } catch (error) {
     console.error(error);
-    alert("Não foi possível enviar a solicitação.");
+    toast.error("Não foi possível enviar a solicitação.");
   }
 }
 
