@@ -1,24 +1,21 @@
 <template>
-  <header class="cliente-header">
-    <div class="cliente-user-area">
-      <div class="cliente-avatar">👤</div>
+  <header class="admin-header">
+    <div class="admin-user-area">
+      <div class="admin-avatar">
+        <UserRound :size="36" />
+      </div>
 
       <div>
         <h1>{{ nomeUsuario }}</h1>
-        <button
-          class="cliente-edit-button"
-          @click="abrirModal"
-        >
-        editar
-      </button>
+        <button class="admin-edit-button" @click="abrirModal">
+          <Pencil :size="18" />
+          Editar
+        </button>
       </div>
     </div>
 
-    <button
-      class="cliente-logout-button"
-      @click="realizarLogout"
-    >
-      Sair
+    <button class="admin-logout-button" @click="realizarLogout">
+      <LogOut :size="22" />
     </button>
   </header>
   <EditarContaModal
@@ -32,11 +29,12 @@
 
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { atualizarSessao } from "../services/authService.ts";
-import { getUsuarioLogado, logout } from "../services/authService.ts";
-import { atualizarUsuario } from "../services/usuarioService.ts";
-import EditarContaModal from "./modals/EditarContaModal.vue";
+import { atualizarSessao } from "../../services/authService.ts";
+import { getUsuarioLogado, logout } from "../../services/authService.ts";
+import { atualizarUsuario } from "../../services/usuarioService.ts";
+import EditarContaModal from "../modals/EditarContaModal.vue";
 import { useToast } from "vue-toastification";
+import { UserRound, Pencil, LogOut } from "lucide-vue-next";
 
 const router = useRouter();
 const nomeUsuario = ref("");

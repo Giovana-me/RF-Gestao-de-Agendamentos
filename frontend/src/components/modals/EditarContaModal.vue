@@ -172,11 +172,10 @@ watch(
 }
 
 .modal h2 {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 700;
+    font-size: 26px;
+    font-weight: 600;
     color: #000;
-    padding: 20px;
+    padding-bottom: 20px;
 }
 
 .campo{
@@ -185,7 +184,7 @@ watch(
     display:flex;
     flex-direction:column;
     margin-bottom:15px;
-    padding: 5px;
+    padding: 10px;
 }
 
 input{

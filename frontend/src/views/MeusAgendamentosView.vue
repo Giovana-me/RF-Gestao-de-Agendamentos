@@ -185,7 +185,7 @@
 </template>
 
 <script setup>
-import ClienteLayout from "@/components/ClienteLayout.vue";
+import ClienteLayout from "@/components/client/ClienteLayout.vue";
 import { ref, onMounted, computed } from "vue";
 import api from "@/services/api";
 import ModalData from "@/components/modals/ModalData.vue";
@@ -430,8 +430,6 @@ h3.section-title {
 }
 
 .divider {
-  height: 1px;
-  background-color: rgba(0, 0, 0, 0.5);
   margin: 28px 0 18px;
 }
 
@@ -445,11 +443,12 @@ h3.section-title {
 .secondary-button,
 .danger-button {
   border: none;
-  border-radius: 30px;
-  padding: 16px;
+  border-radius: 26px;
+  width: 100%;
+  height: 50px;
+  gap: 10px;
   font-size: 16px;
   cursor: pointer;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
 }
 
 .secondary-button {
@@ -457,9 +456,19 @@ h3.section-title {
   color: #000;
 }
 
+.secondary-button:hover{
+  background:#94335c;
+  color:white;
+}
+
 .danger-button {
   background-color: #bb5151;
   color: #fff;
+}
+
+.danger-button:hover {
+  background:#933341;
+  color:white;
 }
 
 .secondary-button:disabled,

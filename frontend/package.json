@@ -15,8 +15,12 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@fullcalendar/core": "^7.0.1",
+    "@fullcalendar/daygrid": "^6.1.21",
+    "@fullcalendar/vue3": "^7.0.1",
     "@vuepic/vue-datepicker": "^12.1.0",
     "axios": "^1.16.0",
+    "lucide-vue-next": "^1.0.0",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4",
     "vue-toastification": "^2.0.0-rc.5"

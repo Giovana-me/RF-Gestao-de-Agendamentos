@@ -65,12 +65,16 @@ const router = useRouter();
 async function realizarLogin() {
   erro.value = "";
     try {
-        const usuario = await login(
-            email.value,
-            senha.value
-        );
-        salvarSessao(usuario);
+      const usuario = await login(
+          email.value,
+          senha.value
+      );
+      salvarSessao(usuario);
+      if (usuario.tipoUsuario === "PROPRIETARIA") {
+        router.push("/agenda");
+      } else {
         router.push("/procedimentos");
+      }
     } catch (e) {
         erro.value = "E-mail ou senha inválidos.";
     }

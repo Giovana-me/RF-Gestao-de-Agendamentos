@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-import ClienteLayout from "@/components/ClienteLayout.vue";
+import ClienteLayout from "@/components/client/ClienteLayout.vue";
 import { ref, onMounted, computed } from "vue";
 import api from "@/services/api";
 import ModalData from "@/components/modals/ModalData.vue";

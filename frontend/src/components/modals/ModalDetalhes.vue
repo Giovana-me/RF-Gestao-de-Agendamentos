@@ -132,12 +132,16 @@ function finalizar() {
 }
 
 .modal-box h2 {
-  margin: 0 0 22px;
   font-size: 26px;
-  font-weight: 700;
+  font-weight: 600;
   color: #000;
-  padding: 20px;
+  padding-bottom: 20px;
 }
+
+.steps {
+  padding: 30px;
+}
+
 
 .details {
   margin-bottom: 28px;
