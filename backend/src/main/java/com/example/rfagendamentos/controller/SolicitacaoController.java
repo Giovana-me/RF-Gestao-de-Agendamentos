@@ -1,5 +1,6 @@
 package com.example.rfagendamentos.controller;
 
+import com.example.rfagendamentos.dto.AgendaEventoDTO;
 import com.example.rfagendamentos.dto.RemarcacaoDTO;
 import com.example.rfagendamentos.model.Solicitacao;
 import com.example.rfagendamentos.service.SolicitacaoService;
@@ -68,6 +69,13 @@ public class SolicitacaoController {
 
     @PatchMapping("/{id}/cancelar")
     public Solicitacao cancelar(@PathVariable Long id) {
+
+        System.out.println(">>> CANCELAR SOLICITAÇÃO CHAMADO: " + id);
         return solicitacaoService.cancelar(id);
+    }
+
+    @GetMapping("/pendentes/agenda")
+    public List<AgendaEventoDTO> listarPendentesParaAgenda() {
+        return solicitacaoService.listarPendentesParaAgenda();
     }
 }

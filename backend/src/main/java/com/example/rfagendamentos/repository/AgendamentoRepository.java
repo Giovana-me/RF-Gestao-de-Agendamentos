@@ -1,6 +1,7 @@
 package com.example.rfagendamentos.repository;
 
 import com.example.rfagendamentos.model.Agendamento;
+import com.example.rfagendamentos.model.StatusAgendamento;
 import com.example.rfagendamentos.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,4 +11,6 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     List<Agendamento> findByCliente(Usuario cliente);
 
     List<Agendamento> findByData(String data);
+
+    List<Agendamento> findByStatus(StatusAgendamento status);
 }

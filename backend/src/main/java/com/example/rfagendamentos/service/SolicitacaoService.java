@@ -6,6 +6,7 @@ import com.example.rfagendamentos.repository.ProcedimentoRepository;
 import com.example.rfagendamentos.repository.SolicitacaoRepository;
 import com.example.rfagendamentos.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import com.example.rfagendamentos.dto.AgendaEventoDTO;
 
 import java.util.List;
 
@@ -134,7 +135,31 @@ public class SolicitacaoService {
             throw new RuntimeException("Apenas solicitações pendentes podem ser canceladas");
         }
 
-        solicitacao.setStatus(StatusSolicitacao.RECUSADA);
+        solicitacao.setStatus(StatusSolicitacao.CANCELADA);
         return solicitacaoRepository.save(solicitacao);
+    }
+
+    private AgendaEventoDTO converterParaAgenda(Solicitacao solicitacao) {
+        return new AgendaEventoDTO(
+                solicitacao.getId(),
+                "SOLICITACAO",
+                solicitacao.getDataDesejada(),
+                solicitacao.getHoraDesejada(),
+                solicitacao.getObservacao(),
+                solicitacao.getStatus().name(),
+                solicitacao.getCliente().getId(),
+                solicitacao.getCliente().getNome(),
+                solicitacao.getCliente().getTelefone(),
+                solicitacao.getProcedimento().getId(),
+                solicitacao.getProcedimento().getNome()
+        );
+    }
+
+    public List<AgendaEventoDTO> listarPendentesParaAgenda() {
+        return solicitacaoRepository
+                .findByStatus(StatusSolicitacao.PENDENTE)
+                .stream()
+                .map(this::converterParaAgenda)
+                .toList();
     }
 }

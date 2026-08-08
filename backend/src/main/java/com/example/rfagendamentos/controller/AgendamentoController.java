@@ -1,5 +1,6 @@
 package com.example.rfagendamentos.controller;
 
+import com.example.rfagendamentos.dto.AgendaEventoDTO;
 import com.example.rfagendamentos.model.Agendamento;
 import com.example.rfagendamentos.model.StatusAgendamento;
 import com.example.rfagendamentos.service.AgendamentoService;
@@ -55,5 +56,10 @@ public class AgendamentoController {
     @PatchMapping("/{id}/cancelar")
     public void cancelar(@PathVariable Long id) {
         agendamentoService.cancelar(id);
+    }
+
+    @GetMapping("/confirmados")
+    public List<AgendaEventoDTO> listarConfirmados() {
+        return agendamentoService.listarConfirmadosParaAgenda();
     }
 }

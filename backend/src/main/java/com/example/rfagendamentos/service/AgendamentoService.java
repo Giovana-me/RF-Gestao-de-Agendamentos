@@ -1,5 +1,6 @@
 package com.example.rfagendamentos.service;
 
+import com.example.rfagendamentos.dto.AgendaEventoDTO;
 import com.example.rfagendamentos.model.Agendamento;
 import com.example.rfagendamentos.model.Procedimento;
 import com.example.rfagendamentos.model.StatusAgendamento;
@@ -91,5 +92,33 @@ public class AgendamentoService {
         Agendamento agendamento = buscarPorId(id);
         agendamento.setStatus(StatusAgendamento.CANCELADO);
         agendamentoRepository.save(agendamento);
+    }
+
+    public List<Agendamento> listarPorStatus(StatusAgendamento status) {
+        return agendamentoRepository.findByStatus(status);
+    }
+
+    private AgendaEventoDTO converterParaAgenda(Agendamento agendamento) {
+        return new AgendaEventoDTO(
+                agendamento.getId(),
+                "AGENDAMENTO",
+                agendamento.getData(),
+                agendamento.getHora(),
+                agendamento.getObservacao(),
+                agendamento.getStatus().name(),
+                agendamento.getCliente().getId(),
+                agendamento.getCliente().getNome(),
+                agendamento.getCliente().getTelefone(),
+                agendamento.getProcedimento().getId(),
+                agendamento.getProcedimento().getNome()
+        );
+    }
+
+    public List<AgendaEventoDTO> listarConfirmadosParaAgenda() {
+        return agendamentoRepository
+                .findByStatus(StatusAgendamento.CONFIRMADO)
+                .stream()
+                .map(this::converterParaAgenda)
+                .toList();
     }
 }
