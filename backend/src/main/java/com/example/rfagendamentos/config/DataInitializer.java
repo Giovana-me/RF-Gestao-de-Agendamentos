@@ -1,5 +1,7 @@
 package com.example.rfagendamentos.config;
 
+import com.example.rfagendamentos.model.Endereco;
+import com.example.rfagendamentos.model.Estado;
 import com.example.rfagendamentos.model.TipoUsuario;
 import com.example.rfagendamentos.model.Usuario;
 import com.example.rfagendamentos.repository.UsuarioRepository;
@@ -17,12 +19,21 @@ public class DataInitializer {
                 return;
             }
             Usuario proprietaria = new Usuario();
+            Endereco endereco = new Endereco();
             proprietaria.setNome("Rosangela Fernandes");
             proprietaria.setEmail("adminrf@gmail.com");
             proprietaria.setSenha(passwordEncoder.encode("186519"));
             proprietaria.setTelefone("(43) 99149-4105");
             proprietaria.setCpf("00000000000");
-            proprietaria.setEndereco("Rua Minas Gerais 141 B, Sertanópolis");
+
+            endereco.setCep("86170-000");
+            endereco.setLogradouro("Rua Minas Gerais");
+            endereco.setNumero("141 B");
+            endereco.setBairro("Centro");
+            endereco.setCidade("Sertanópolis");
+            endereco.setEstado(Estado.PR);
+
+            proprietaria.setEndereco(endereco);
             proprietaria.setTipoUsuario(TipoUsuario.PROPRIETARIA);
             proprietaria.setAtivo(true);
 

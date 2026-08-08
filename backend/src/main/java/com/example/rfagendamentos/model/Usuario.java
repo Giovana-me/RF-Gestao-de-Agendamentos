@@ -21,7 +21,9 @@ public class Usuario {
     @Column(unique = true)
     private String cpf;
 
-    private String endereco;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "endereco_id")
+    private Endereco endereco;
 
     @Enumerated(EnumType.STRING)
     private TipoUsuario tipoUsuario;
@@ -31,7 +33,7 @@ public class Usuario {
     public Usuario() {}
 
     public Usuario(Long id, String nome, String email, String senha, String telefone,
-                   String cpf, String endereco, TipoUsuario tipoUsuario, Boolean ativo) {
+                   String cpf, Endereco endereco, TipoUsuario tipoUsuario, Boolean ativo) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -55,7 +57,7 @@ public class Usuario {
 
     public String getCpf() { return cpf; }
 
-    public String getEndereco() { return endereco; }
+    public Endereco getEndereco() { return endereco; }
 
     public TipoUsuario getTipoUsuario() { return tipoUsuario; }
 
@@ -73,7 +75,7 @@ public class Usuario {
 
     public void setCpf(String cpf) { this.cpf = cpf; }
 
-    public void setEndereco(String endereco) { this.endereco = endereco; }
+    public void setEndereco(Endereco endereco) { this.endereco = endereco; }
 
     public void setTipoUsuario(TipoUsuario tipoUsuario) { this.tipoUsuario = tipoUsuario; }
 

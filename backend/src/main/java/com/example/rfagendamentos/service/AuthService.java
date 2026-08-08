@@ -2,7 +2,9 @@ package com.example.rfagendamentos.service;
 
 import com.example.rfagendamentos.dto.LoginRequest;
 import com.example.rfagendamentos.dto.LoginResponse;
+import com.example.rfagendamentos.dto.EnderecoDTO;
 import com.example.rfagendamentos.exception.AuthenticationException;
+import com.example.rfagendamentos.model.Endereco;
 import com.example.rfagendamentos.model.Usuario;
 import com.example.rfagendamentos.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,9 +42,24 @@ public class AuthService {
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getTelefone(),
-                usuario.getEndereco(),
+                converterEndereco(usuario.getEndereco()),
                 usuario.getTipoUsuario(),
                 token
         );
+    }
+
+    private EnderecoDTO converterEndereco(Endereco endereco) {
+        if (endereco == null) {
+            return null;
+        }
+        EnderecoDTO dto = new EnderecoDTO();
+        dto.setCep(endereco.getCep());
+        dto.setLogradouro(endereco.getLogradouro());
+        dto.setNumero(endereco.getNumero());
+        dto.setBairro(endereco.getBairro());
+        dto.setCidade(endereco.getCidade());
+        dto.setEstado(endereco.getEstado());
+
+        return dto;
     }
 }

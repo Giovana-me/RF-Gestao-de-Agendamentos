@@ -7,14 +7,14 @@ public class LoginResponse {
     private String nome;
     private String email;
     private String telefone;
-    private String endereco;
+    private EnderecoDTO endereco;
     private TipoUsuario tipoUsuario;
     private String token;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(Long id, String nome, String email, String telefone, String endereco, TipoUsuario tipoUsuario, String token) {
+    public LoginResponse(Long id, String nome, String email, String telefone, EnderecoDTO endereco, TipoUsuario tipoUsuario, String token) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -40,7 +40,7 @@ public class LoginResponse {
         return telefone;
     }
 
-    public String getEndereco() {
+    public EnderecoDTO getEndereco() {
         return endereco;
     }
 

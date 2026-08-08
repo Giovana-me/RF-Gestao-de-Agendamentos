@@ -3,14 +3,16 @@ package com.example.rfagendamentos.dto;
 public class AtualizarContaDTO {
     private String nome;
     private String telefone;
-    private String endereco;
+    private String cpf;
+    private EnderecoDTO endereco;
 
     public AtualizarContaDTO() {
     }
 
-    public AtualizarContaDTO(String nome, String telefone, String endereco) {
+    public AtualizarContaDTO(String nome, String telefone, String cpf, EnderecoDTO endereco) {
         this.nome = nome;
         this.telefone = telefone;
+        this.cpf = cpf;
         this.endereco = endereco;
     }
 
@@ -30,11 +32,19 @@ public class AtualizarContaDTO {
         this.telefone = telefone;
     }
 
-    public String getEndereco() {
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public EnderecoDTO getEndereco() {
         return endereco;
     }
 
-    public void setEndereco(String endereco) {
+    public void setEndereco(EnderecoDTO endereco) {
         this.endereco = endereco;
     }
 }

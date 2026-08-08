@@ -1,6 +1,10 @@
 package com.example.rfagendamentos.service;
 
+import com.example.rfagendamentos.dto.AlterarEmailDTO;
+import com.example.rfagendamentos.dto.AlterarSenhaDTO;
 import com.example.rfagendamentos.dto.AtualizarContaDTO;
+import com.example.rfagendamentos.dto.EnderecoDTO;
+import com.example.rfagendamentos.model.Endereco;
 import com.example.rfagendamentos.model.TipoUsuario;
 import com.example.rfagendamentos.model.Usuario;
 import com.example.rfagendamentos.repository.UsuarioRepository;
@@ -45,10 +49,10 @@ public class UsuarioService {
 
     public Usuario atualizarConta(Long id, AtualizarContaDTO dadosAtualizados) {
         Usuario usuario = buscarPorId(id);
-
         usuario.setNome(dadosAtualizados.getNome());
         usuario.setTelefone(dadosAtualizados.getTelefone());
-        usuario.setEndereco(dadosAtualizados.getEndereco());
+        usuario.setCpf(dadosAtualizados.getCpf());
+        usuario.setEndereco(converterEndereco(dadosAtualizados.getEndereco(),usuario.getEndereco()));
 
         return usuarioRepository.save(usuario);
     }
@@ -61,5 +65,54 @@ public class UsuarioService {
 
     public List<Usuario> listarClientes() {
         return usuarioRepository.findByTipoUsuario(TipoUsuario.CLIENTE);
+    }
+
+    private Endereco converterEndereco(EnderecoDTO dto, Endereco endereco) {
+        if (dto == null) {
+            return endereco;
+        }
+        if (endereco == null) {
+            endereco = new Endereco();
+        }
+        endereco.setCep(dto.getCep());
+        endereco.setLogradouro(dto.getLogradouro());
+        endereco.setNumero(dto.getNumero());
+        endereco.setBairro(dto.getBairro());
+        endereco.setCidade(dto.getCidade());
+        endereco.setEstado(dto.getEstado());
+
+        return endereco;
+    }
+
+    public Usuario alterarEmail(Long id, AlterarEmailDTO dto) {
+        Usuario usuario = buscarPorId(id);
+        if (!passwordEncoder.matches(dto.getSenhaAtual(), usuario.getSenha())) {
+            throw new RuntimeException("Senha inválida.");
+        }
+        Usuario existente =
+                usuarioRepository.findByEmail(dto.getNovoEmail()).orElse(null);
+        if (existente != null && !existente.getId().equals(id)) {
+            throw new RuntimeException("Este e-mail já está em uso.");
+        }
+        usuario.setEmail(dto.getNovoEmail());
+        return usuarioRepository.save(usuario);
+    }
+
+    public void alterarSenha(Long id, AlterarSenhaDTO dto) {
+        Usuario usuario = buscarPorId(id);
+        boolean senhaCorreta = passwordEncoder.matches(
+                dto.getSenhaAtual(),
+                usuario.getSenha()
+        );
+
+        if (!senhaCorreta) {
+            throw new RuntimeException("Senha atual incorreta.");
+        }
+
+        usuario.setSenha(
+                passwordEncoder.encode(dto.getNovaSenha())
+        );
+
+        usuarioRepository.save(usuario);
     }
 }
