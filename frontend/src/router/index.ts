@@ -4,6 +4,7 @@ import MeusAgendamentosView from "../views/MeusAgendamentosView.vue";
 import LoginView from "../views/LoginView.vue";
 import { estaAutenticado, isCliente, isProprietaria } from "../services/authService";
 import AgendaView from "@/views/AgendaView.vue";
+import AdminLayout from "@/components/admin/AdminLayout.vue";
 
 const routes = [
   {
@@ -17,12 +18,18 @@ const routes = [
   },
   {
     path: "/agenda",
-    name: "agenda",
-    component: AgendaView,
+    component: AdminLayout,
     meta: {
       requiresAuth: true,
       role: "PROPRIETARIA"
-    }
+    },
+    children: [
+      {
+        path: "",
+        name: "agenda",
+        component: AgendaView
+      }
+    ]
   },
   {
     path: "/procedimentos",

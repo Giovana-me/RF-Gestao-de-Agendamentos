@@ -1,17 +1,13 @@
 <template>
-  <div class="admin-page">
+  <AdminHeader />
 
-    <AdminHeader />
+  <div class="admin-layout">
 
-    <div class="admin-layout">
+    <AdminSidebar />
 
-      <AdminSidebar />
-
-      <main class="admin-content">
-        <slot />
-      </main>
-
-    </div>
+    <main class="admin-content">
+      <RouterView />
+    </main>
 
   </div>
 </template>
