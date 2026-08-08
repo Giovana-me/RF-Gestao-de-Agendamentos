@@ -6,25 +6,25 @@
       </button>
 
       <h2>Selecione um horário</h2>
+      <div class="modal-content">
+        <Stepper :etapaAtual="3" />
 
-      <Stepper :etapaAtual="3" />
+        <p class="subtitle">
+          Escolha o horário desejado para o atendimento.
+        </p>
 
-      <p class="subtitle">
-        Escolha o horário desejado para o atendimento.
-      </p>
-
-      <div class="time-grid">
-        <button
-          v-for="hora in horarios"
-          :key="hora"
-          class="time-button"
-          :class="{ selected: horaSelecionada === hora }"
-          @click="horaSelecionada = hora"
-        >
-          {{ hora }}
-        </button>
+        <div class="time-grid">
+          <button
+            v-for="hora in horarios"
+            :key="hora"
+            class="time-button"
+            :class="{ selected: horaSelecionada === hora }"
+            @click="horaSelecionada = hora"
+          >
+            {{ hora }}
+          </button>
+        </div>
       </div>
-
       <div class="actions">
         <button class="back-button" @click="$emit('voltar')">
           Voltar
@@ -82,18 +82,23 @@ function continuar() {
   z-index: 99999;
 }
 
+.modal-content{
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
 .modal-box {
   width: 800px;
-  height: 800px;
-  background-color: #fff;
+  background-color: white;
   border-radius: 30px;
-  padding: 36px;
+  padding: 30px;
   box-sizing: border-box;
   position: relative;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
-  color: #000;
+  color: black;
   display: flex;
   flex-direction: column;
+  max-height: 90vh; 
 }
 
 .close-button {
@@ -127,18 +132,18 @@ function continuar() {
 .time-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+  gap: 16px;
 }
 
 .time-button {
-  border: none;
+  border: 1px solid #94335c;
+  border-radius: 18px;
+  box-sizing: border-box;
   background-color: #fff;
   color: #000;
-  border-radius: 12px;
-  padding: 15px;
-  font-size: 16px;
+  padding: 16px;
+  font-size: 18px;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.22);
   display: flex;
   justify-content: center;
 }
@@ -162,9 +167,10 @@ function continuar() {
   cursor: pointer;
   font-size: 16px;
   width: 100%;
-  gap:10px;
+  gap:16px;
   margin-top: 25px;
   height: 50px;
+  flex-shrink: 0;
 }
 
 .back-button:hover {
@@ -186,4 +192,23 @@ function continuar() {
   background-color: #dd81b5;
   color: white;
 }
+
+.modal-content::-webkit-scrollbar{
+    width:8px;
+}
+
+.modal-content::-webkit-scrollbar-track{
+    background:#f3f3f3;
+    border-radius:10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb{
+    background:#dd81b5;
+    border-radius:10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover{
+    background:#94335c;
+}
+
 </style>

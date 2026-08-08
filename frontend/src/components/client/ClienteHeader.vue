@@ -22,6 +22,18 @@
     :visivel="modalAberto"
     @fechar="fecharModal"
     @salvar="salvarConta"
+    @alterarEmail="abrirAlteracaoEmail"
+    @alterarSenha="abrirAlteracaoSenha"
+/>
+<AlterarEmailModal
+    :visivel="modalAlterarEmail"
+    @fechar="fecharAlteracaoEmail"
+    @confirmar="confirmarAlteracaoEmail"
+/>
+<AlterarSenhaModal
+    :visivel="modalAlterarSenha"
+    @fechar="fecharAlteracaoSenha"
+    @confirmar="confirmarAlteracaoSenha"
 />
 </template>
 
@@ -35,11 +47,18 @@ import { atualizarUsuario } from "../../services/usuarioService.ts";
 import EditarContaModal from "../modals/EditarContaModal.vue";
 import { useToast } from "vue-toastification";
 import { UserRound, Pencil, LogOut } from "lucide-vue-next";
+import type { AtualizarContaDTO } from "../../services/usuarioService.ts";
+import AlterarEmailModal from "../modals/AlterarEmailModal.vue";
+import { alterarEmail } from "../../services/usuarioService";
+import AlterarSenhaModal from "../modals/AlterarSenhaModal.vue";
+import { alterarSenha } from "../../services/usuarioService";
 
 const router = useRouter();
 const nomeUsuario = ref("");
 const modalAberto = ref(false);
 const toast = useToast();
+const modalAlterarEmail = ref(false);
+const modalAlterarSenha = ref(false);
 
 onMounted(() => {
     const usuario = getUsuarioLogado();
@@ -48,11 +67,93 @@ onMounted(() => {
     }
 });
 
-async function salvarConta(dados: {
-    nome: string;
-    telefone: string;
-    endereco: string;
+function abrirAlteracaoEmail() {
+    modalAberto.value = false;
+    modalAlterarEmail.value = true;
+}
+
+function fecharAlteracaoEmail() {
+    modalAlterarEmail.value = false;
+    modalAberto.value = true;
+}
+
+async function confirmarAlteracaoEmail(dados: {
+    email: string;
+    senha: string;
 }) {
+    try {
+        const usuario = getUsuarioLogado();
+        if (!usuario) {
+            return;
+        }
+        const usuarioAtualizado = await alterarEmail(
+          usuario.id,
+          {
+            novoEmail: dados.email,
+            senhaAtual: dados.senha
+          }
+        );
+
+        const sessaoAtualizada = {
+            ...usuario,
+            nome: usuarioAtualizado.nome,
+            email: usuarioAtualizado.email,
+            telefone: usuarioAtualizado.telefone,
+            endereco: usuarioAtualizado.endereco
+        };
+
+        atualizarSessao(sessaoAtualizada);
+
+        toast.success("E-mail alterado com sucesso!");
+        fecharAlteracaoEmail();
+
+    } catch (error) {
+        console.error(error);
+        toast.error("Não foi possível alterar o e-mail.");
+    }
+}
+
+function abrirAlteracaoSenha() {
+    modalAberto.value = false;
+    modalAlterarSenha.value = true;
+}
+
+function fecharAlteracaoSenha() {
+    modalAlterarSenha.value = false;
+    modalAberto.value = true;
+}
+
+async function confirmarAlteracaoSenha(dados: {
+    senhaAtual: string;
+    novaSenha: string;
+}) {
+    try {
+
+        const usuario = getUsuarioLogado();
+
+        if (!usuario) {
+            return;
+        }
+
+        await alterarSenha(
+            usuario.id,
+            {
+                senhaAtual: dados.senhaAtual,
+                novaSenha: dados.novaSenha
+            }
+        );
+
+        toast.success("Senha alterada com sucesso!");
+
+        fecharAlteracaoSenha();
+
+    } catch (error) {
+        console.error(error);
+        toast.error("Não foi possível alterar a senha.");
+    }
+}
+
+async function salvarConta(dados: AtualizarContaDTO) {
     try {
       const usuarioLogado = getUsuarioLogado();
       if (!usuarioLogado) {
@@ -65,7 +166,9 @@ async function salvarConta(dados: {
 
       const sessaoAtualizada = {
         ...usuarioLogado,
-        nome: usuarioAtualizado.nome
+        nome: usuarioAtualizado.nome,
+        telefone: usuarioAtualizado.telefone,
+        endereco: usuarioAtualizado.endereco
       };
         
         atualizarSessao(sessaoAtualizada);

@@ -1,14 +1,15 @@
-interface UsuarioLogado {
+import api from "./api";
+import type {Endereco} from "../interfaces/Endereco";
+
+export interface UsuarioLogado {
     id: number;
     token: string;
     nome: string;
     email: string;
     telefone: string;
-    endereco: string;
+    endereco: Endereco;
     tipoUsuario: string;
 }
-
-import api from "./api";
 
 export function atualizarSessao(usuario: UsuarioLogado): void {
     sessionStorage.setItem("id", usuario.id.toString());
@@ -16,6 +17,8 @@ export function atualizarSessao(usuario: UsuarioLogado): void {
     sessionStorage.setItem("email", usuario.email);
     sessionStorage.setItem("tipoUsuario", usuario.tipoUsuario);
     sessionStorage.setItem("token", usuario.token);
+    sessionStorage.setItem("telefone", usuario.telefone);
+    sessionStorage.setItem("endereco", JSON.stringify(usuario.endereco));
 }
 
 export async function login(email: string, senha: string): Promise<UsuarioLogado> {
@@ -34,7 +37,7 @@ export function salvarSessao(usuario: UsuarioLogado): void {
     sessionStorage.setItem("email", usuario.email);
     sessionStorage.setItem("tipoUsuario", usuario.tipoUsuario);
     sessionStorage.setItem("telefone", usuario.telefone);
-    sessionStorage.setItem("endereco", usuario.endereco);
+    sessionStorage.setItem("endereco", JSON.stringify(usuario.endereco));
 }
 
 export function logout() {
@@ -62,6 +65,9 @@ export function getUsuarioLogado(): UsuarioLogado | null {
     if (!token) {
         return null;
     }
+
+    const endereco = sessionStorage.getItem("endereco");
+
     return {
         id: Number(sessionStorage.getItem("id")),
         token,
@@ -69,8 +75,15 @@ export function getUsuarioLogado(): UsuarioLogado | null {
         email: sessionStorage.getItem("email")?? "",
         tipoUsuario: sessionStorage.getItem("tipoUsuario")?? "",
         telefone: sessionStorage.getItem("telefone")?? "",
-        endereco: sessionStorage.getItem("endereco")?? ""
-    }
+        endereco: endereco ? JSON.parse(endereco) : {
+            cep: "",
+            logradouro: "",
+            numero: "",
+            bairro: "",
+            cidade: "",
+            estado: ""
+        }
+    };
 }
 
 export function getUsuarioAutenticadoOuErro(): UsuarioLogado {

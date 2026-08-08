@@ -4,72 +4,138 @@
     class="modal-overlay"
 >
     <div class="modal">
-        <h2>Minha Conta</h2>
-        <div class="campo">
-            <label>Nome</label>
-            <input
-                type="text"
-                v-model="nome"
-            >
-        </div>
-        <div class="campo">
-            <label>Telefone</label>
-            <input
-                type="text"
-                v-model="telefone"
-            >
-        </div>
-        <div class="campo">
-            <label>Endereço</label>
-            <input
-                type="text"
-                v-model="endereco"
-            >
-        </div>
-        <div class="campo">
+    <h2>Minha Conta</h2>
+        <div class="modal-content">
+            <div class="campo">
+                <label>Nome</label>
+                <input
+                    type="text"
+                    v-model="usuario.nome"
+                >
+            </div>
+            <div class="campo">
+                <label>Telefone</label>
+                <input
+                    type="text"
+                    v-model="usuario.telefone"
+                >
+            </div>
+            <div class="campo">
 
-            <label>CPF</label>
+                <label>CPF</label>
 
-            <input
-                type="text"
-                v-model="cpf"
-                disabled
-            >
-        </div>
-        <div class="campo">
+                <input
+                    type="text"
+                    v-model="usuario.cpf"
+                >
+            </div>
+            <div class="campo">
+                <label>CEP</label>
 
-            <label>Email</label>
+                <input
+                    type="text"
+                    v-model="usuario.endereco.cep"
+                    maxlength="9"
+                    @input="formatarCep"
+                    @blur="consultarCep"
+                >
+            </div>
 
-            <input
-                type="email"
-                v-model="email"
-                disabled
-            >
-        </div>
-        <p
-            v-if="erro"
-            class="mensagem-erro"
-        >
-        {{ erro }}
-        </p>
-        <div class="buttons">
+            <div class="campo">
+                <label>Rua</label>
 
-            <button
-                class="cancelar"
-                @click="fechar"
-            >
-                Cancelar
-            </button>
+                <input
+                    type="text"
+                    v-model="usuario.endereco.logradouro"
+                    readonly
+                >
+            </div>
 
-            <button
-                class="salvar"
-                @click="salvar"
-            >
-                Salvar
-            </button>
+            <div class="campo">
+                <label>Número</label>
+
+                <input
+                    type="text"
+                    v-model="usuario.endereco.numero"
+                >
+            </div>
+
+            <div class="campo">
+                <label>Bairro</label>
+
+                <input
+                    type="text"
+                    v-model="usuario.endereco.bairro"
+                    readonly
+                >
+            </div>
+
+            <div class="campo">
+                <label>Cidade</label>
+
+                <input
+                    type="text"
+                    v-model="usuario.endereco.cidade"
+                    readonly
+                >
+            </div>
+
+            <div class="campo">
+                <label>Estado</label>
+
+                <input
+                    type="text"
+                    v-model="usuario.endereco.estado"
+                    readonly
+                >
+            </div>
+            <div class="campo-acoes">
+            <label>E-mail</label>
+            <div class="linha-acao">
+                <span>{{ usuario.email }}</span>
+                <button
+                    class="link-acao"
+                    @click="$emit('alterarEmail')"
+                >
+                    Alterar e-mail
+                </button>
+            </div>
+            </div>
+            <div class="campo-acoes">
+                <label>Senha</label>
+                <div class="linha-acao">
+                    <span>••••••••</span>
+                    <button
+                        class="link-acao"
+                        @click="$emit('alterarSenha')"
+                    >
+                        Alterar senha
+                    </button>
+                </div>
+            </div>
+                </div>
+                <p
+                    v-if="erro"
+                        class="mensagem-erro"
+                >
+                {{ erro }}
+                </p>
+            <div class="buttons">
+                <button
+                    class="cancelar"
+                    @click="fechar"
+                >
+                    Cancelar
+                </button>
+                <button
+                    class="salvar"
+                    @click="salvar"
+                >
+                    Salvar
+                </button>
+            </div>
         </div>
     </div>
-</div>
 </template>
 
 <script setup lang="ts">
@@ -78,6 +144,11 @@ import { ref } from "vue";
 import { watch } from "vue";
 import { getUsuarioLogado } from "../../services/authService";
 import { buscarUsuarioPorId } from "../../services/usuarioService";
+import { buscarCep } from "@/services/cepService";
+import { useToast } from "vue-toastification";
+import type { Usuario } from "../../services/usuarioService";
+
+const toast = useToast();
 
 const props = defineProps<{
     visivel: boolean
@@ -85,15 +156,30 @@ const props = defineProps<{
 
 const emit = defineEmits([
     "fechar",
-    "salvar"
+    "salvar",
+    "alterarEmail",
+    "alterarSenha"
 ]);
 
 const erro = ref("");
-const nome = ref("");
-const telefone = ref("");
-const endereco = ref("");
-const cpf = ref("");
-const email = ref("");
+
+const usuario = ref<Usuario>({
+    id: 0,
+    nome: "",
+    email: "",
+    telefone: "",
+    cpf: "",
+    endereco: {
+        cep: "",
+        logradouro: "",
+        numero: "",
+        bairro: "",
+        cidade: "",
+        estado: ""
+    },
+    tipoUsuario: "",
+    ativo: true
+});
 
 async function carregarUsuario() {
     const usuarioLogado = getUsuarioLogado();
@@ -101,13 +187,31 @@ async function carregarUsuario() {
     if (!usuarioLogado) {
         return;
     }
-    const usuario = await buscarUsuarioPorId(usuarioLogado.id);
+    usuario.value = await buscarUsuarioPorId(usuarioLogado.id);
+}
 
-    nome.value = usuario.nome;
-    telefone.value = usuario.telefone;
-    endereco.value = usuario.endereco;
-    cpf.value = usuario.cpf;
-    email.value = usuario.email;
+async function consultarCep() {
+    const cep = usuario.value.endereco.cep.replace(/\D/g, "");
+    if (cep.length !== 8) {
+        limparEndereco();
+        return;
+    }
+    try {
+        const resultado = await buscarCep(cep);
+
+        if (resultado.erro) {
+            toast.error("CEP não encontrado.");
+            return;
+        }
+        usuario.value.endereco.logradouro = resultado.logradouro;
+        usuario.value.endereco.bairro = resultado.bairro;
+        usuario.value.endereco.cidade = resultado.localidade;
+        usuario.value.endereco.estado = resultado.uf;
+
+    } catch (error) {
+        console.error(error);
+        toast.error("Erro ao consultar o CEP.");
+    }
 }
 
 function fechar(){
@@ -115,30 +219,52 @@ function fechar(){
 }
 
 function salvar() {
-
     erro.value = "";
-
-    if (!nome.value.trim()) {
+    if (!usuario.value.nome.trim()) {
         erro.value = "O nome é obrigatório.";
         return;
     }
-
-    if (!telefone.value.trim()) {
+    if (!usuario.value.telefone.trim()) {
         erro.value = "O telefone é obrigatório.";
         return;
     }
-
-    if (!endereco.value.trim()) {
-        erro.value = "O endereço é obrigatório.";
+    if (!usuario.value.cpf.trim()) {
+        erro.value = "O CPF é obrigatório.";
         return;
     }
-
+    if (!usuario.value.endereco.cep.trim()) {
+        erro.value = "O CEP é obrigatório.";
+        return;
+    }
+    if (!usuario.value.endereco.numero.trim()) {
+        erro.value = "O número é obrigatório.";
+        return;
+    }
     emit("salvar", {
-        nome: nome.value,
-        telefone: telefone.value,
-        endereco: endereco.value
+        nome: usuario.value.nome,
+        telefone: usuario.value.telefone,
+        cpf: usuario.value.cpf,
+        endereco: usuario.value.endereco
     });
+}
 
+function formatarCep() {
+    let cep = usuario.value.endereco.cep.replace(/\D/g, "");
+    if (cep.length > 8) {
+        cep = cep.substring(0, 8);
+    }
+
+    if (cep.length > 5) {
+        cep = cep.replace(/^(\d{5})(\d+)/, "$1-$2");
+    }
+    usuario.value.endereco.cep = cep;
+}
+
+function limparEndereco() {
+    usuario.value.endereco.logradouro = "";
+    usuario.value.endereco.bairro = "";
+    usuario.value.endereco.cidade = "";
+    usuario.value.endereco.estado = "";
 }
 
 watch(
@@ -163,12 +289,21 @@ watch(
     z-index:999;
 }
 
+.modal-content{
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
 .modal{
     width: 800px;
-    height: 800px;
     background:white;
     border-radius:30px;
     padding:30px;
+    max-height: 90vh; 
+    box-sizing: border-box;
+    display: flex; 
+    flex-direction: column;
 }
 
 .modal h2 {
@@ -203,11 +338,11 @@ input{
 }
 
 .buttons {
-    display:flex;
-    justify-content:flex;
-    gap:10px;
-    margin-top:25px;
+    display: flex;
+    gap: 16px;
+    margin-top: 25px;
     height: 50px;
+    flex-shrink: 0;
 }
 
 .salvar{
@@ -237,4 +372,85 @@ input{
     color:white;
 }
 
+.modal-content::-webkit-scrollbar{
+    width:8px;
+}
+
+.modal-content::-webkit-scrollbar-track{
+    background:#f3f3f3;
+    border-radius:10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb{
+    background:#dd81b5;
+    border-radius:10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover{
+    background:#94335c;
+}
+
+input[readonly] {
+    background-color: #f6f6f6;
+    color: #555;
+    cursor: default;
+}
+
+.campo-acoes {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.campo-acoes label {
+    font-size: 18px;
+    color: rgb(63, 63, 63);
+    margin-bottom: 10px;
+}
+
+.linha-acao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border: 1px solid #ccc;
+    border-radius: 26px;
+
+    padding: 0 20px;
+
+    min-height: 60px;
+}
+
+.linha-acao span {
+    font-size: 18px;
+    color: #333;
+}
+
+.link-acao {
+    background: transparent;
+    border: none;
+
+    color: #94335c;
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: .2s;
+}
+
+.link-acao:hover {
+    color: #dd81b5;
+    text-decoration: underline;
+}
+
 </style>
+
+/*width: 800px;
+    background:white;
+    border-radius:30px;
+    padding:30px;
+    max-height: 90vh; 
+    box-sizing: border-box;
+    display: flex; 
+    flex-direction: column;*/

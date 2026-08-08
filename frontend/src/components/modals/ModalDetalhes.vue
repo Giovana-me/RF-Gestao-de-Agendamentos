@@ -6,40 +6,42 @@
       </button>
 
       <h2>Detalhes do agendamento</h2>
-      
-      <Stepper :etapaAtual="4" />
+      <div class="modal-content">
+        <Stepper :etapaAtual="4" />
 
-      <div class="details">
-        <p>
-          <strong>Procedimento:</strong>
-          {{ procedimento?.nome }}
-        </p>
+        <div class="details">
+          <p>
+            <strong>Procedimento:</strong>
+            {{ procedimento?.nome }}
+          </p>
 
-        <p>
-          <strong>Local:</strong>
-          Rua Minas Gerais, 141B - Sertanópolis/PR
-        </p>
+          <p>
+            <strong>Local:</strong>
+            Rua Minas Gerais, 141B - Sertanópolis/PR
+          </p>
 
-        <p>
-          <strong>Profissional:</strong>
-          Rosangela Fernandes
-        </p>
+          <p>
+            <strong>Profissional:</strong>
+            Rosangela Fernandes
+          </p>
 
-        <p>
-          <strong>Data/Hora:</strong>
-          {{ dataFormatada }} - {{ hora }}
-        </p>
+          <p>
+            <strong>Data/Hora:</strong>
+            {{ dataFormatada }} - {{ hora }}
+          </p>
+        </div>
+
+        <label class="label" for="observacao">
+          Alguma observação adicional?
+        </label>
+
+        <textarea
+          id="observacao"
+          v-model="observacao"
+          placeholder="Descreva sua observação..."
+        >
+        </textarea>
       </div>
-
-      <label class="label" for="observacao">
-        Alguma observação adicional?
-      </label>
-
-      <textarea
-        id="observacao"
-        v-model="observacao"
-        placeholder="Descreva sua observação..."
-      ></textarea>
 
       <div class="actions">
         <button class="back-button" @click="$emit('voltar')">
@@ -106,15 +108,20 @@ function finalizar() {
   z-index: 99999;
 }
 
+.modal-content{
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
 .modal-box {
   width: 800px;
-  height: 800px;
-  background-color: #fff;
+  max-height: 90vh;
+  background-color: white;
   border-radius: 30px;
-  padding: 36px;
+  padding: 30px;
   box-sizing: border-box;
   position: relative;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
   color: #000;
   display: flex;
   flex-direction: column;
@@ -156,22 +163,20 @@ function finalizar() {
 .label {
   display: block;
   margin-bottom: 12px;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
-  color: #000;
 }
 
 textarea {
   width: 100%;
   height: 140px;
-  border: 1px solid #000;
-  border-radius: 8px;
+  border: 1px solid #94335c;
+  border-radius: 18px;
+  box-sizing: border-box;
   padding: 18px;
-  font-size: 17px;
+  font-size: 16px;
   font-family: Inter, Arial, sans-serif;
   resize: none;
-  box-sizing: border-box;
-  color: #000;
 }
 
 textarea::placeholder {
@@ -195,6 +200,7 @@ textarea::placeholder {
   gap:10px;
   margin-top: 25px;
   height: 50px;
+  flex-shrink: 0;
 }
 
 .back-button:hover {
@@ -216,4 +222,23 @@ textarea::placeholder {
   background-color: #dd81b5;
   color: white;
 }
+
+.modal-content::-webkit-scrollbar{
+    width:8px;
+}
+
+.modal-content::-webkit-scrollbar-track{
+    background:#f3f3f3;
+    border-radius:10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb{
+    background:#dd81b5;
+    border-radius:10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover{
+    background:#94335c;
+}
+
 </style>

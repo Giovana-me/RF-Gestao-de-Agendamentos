@@ -6,20 +6,20 @@
       </button>
 
       <h2>Selecione uma data</h2>
+      <div class="modal-content">
+        <Stepper :etapaAtual="2" />
 
-      <Stepper :etapaAtual="2" />
+        <p class="subtitle">
+          Escolha a data desejada para o procedimento.
+        </p>
 
-      <p class="subtitle">
-        Escolha a data desejada para o procedimento.
-      </p>
-
-      <input
-        type="date"
-        class="date-input"
-        v-model="dataSelecionada"
-      :min="dataMinima"
-      />
-
+        <input
+          type="date"
+          class="date-input"
+          v-model="dataSelecionada"
+        :min="dataMinima"
+        />
+      </div>
       <div class="actions">
         <button class="back-button" @click="$emit('fechar')">
           Voltar
@@ -73,16 +73,21 @@ function continuar() {
   z-index: 99999;
 }
 
+.modal-content{
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
 .modal-box {
   width: 800px;
-  height: 600px;
-  background-color: #fff;
+  max-height: 90vh;
+  background-color: white;
   border-radius: 30px;
-  padding: 50px;
+  padding: 30px;
   box-sizing: border-box;
   position: relative;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
-  color: #000;
+  color: black;
   display: flex;
   flex-direction: column;
 }
@@ -112,8 +117,6 @@ function continuar() {
 .subtitle {
   margin: 12px 0 28px;
   font-size: 18px;
-  color: #000;
-  padding: 20px;
 }
 
 .date-input {
@@ -143,6 +146,7 @@ function continuar() {
   gap:10px;
   margin-top: 25px;
   height: 50px;
+  flex-shrink: 0;
 }
 
 .back-button:hover{
@@ -164,4 +168,23 @@ function continuar() {
   background-color: #dd81b5;
   color: #fff;
 }
+
+.modal-content::-webkit-scrollbar{
+    width:8px;
+}
+
+.modal-content::-webkit-scrollbar-track{
+    background:#f3f3f3;
+    border-radius:10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb{
+    background:#dd81b5;
+    border-radius:10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover{
+    background:#94335c;
+}
+
 </style>
