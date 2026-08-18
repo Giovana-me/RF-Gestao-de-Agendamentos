@@ -32,9 +32,33 @@ const routes = [
     ]
   },
   {
+    path: "/procedimentos-admin",
+    component: AdminLayout,
+    meta: {
+      requiresAuth: true,
+      role: "PROPRIETARIA"
+    },
+    children: [
+      {
+        path: "",
+        name: "procedimentos-admin",
+        component: () => import("@/views/GerenciarProcedimentosView.vue")
+      }
+    ]
+  },
+  {
     path: "/procedimentos",
     name: "procedimentos",
     component: ProcedimentosView,
+    meta: {
+      requiresAuth: true,
+      role: "CLIENTE"
+    }
+  },
+  {
+    path: "/tabela-precos",
+    name: "TabelaPrecos",
+    component: () => import("@/views/TabelaPrecosView.vue"),
     meta: {
       requiresAuth: true,
       role: "CLIENTE"

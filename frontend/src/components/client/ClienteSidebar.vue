@@ -10,6 +10,11 @@
       <span> Agendamentos </span>
     </button>
 
+    <button class="cliente-menu-button" :class="{ active: rotaAtual === '/tabela-precos' }" @click="ir('/tabela-precos')">
+      <BadgeDollarSign :size="24"/>
+      <span> Preços </span>
+    </button>
+
     <div class="cliente-brand">
       <div class="brand-circle">
         <img src="../../assets/images/rf-image.png" alt="">
@@ -20,12 +25,13 @@
 
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import { CalendarPlus, CalendarCheck } from "lucide-vue-next";
+import { CalendarPlus, CalendarCheck, BadgeDollarSign } from "lucide-vue-next";
+import { computed } from "vue";
 
 const router = useRouter();
 const route = useRoute();
 
-const rotaAtual = route.path;
+const rotaAtual = computed(() => route.path);
 
 function ir(caminho) {
   router.push(caminho);

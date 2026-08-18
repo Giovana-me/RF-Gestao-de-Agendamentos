@@ -5,11 +5,6 @@
       <span> Agenda </span>
     </button>
 
-    <button class="admin-menu-button" :class="{ active: rotaAtual === '/solicitacoes' }" @click="ir('/solicitacoes')">
-      <Bell :size="24"/>
-      <span> Solicitações </span>
-    </button>
-
     <button class="admin-menu-button" :class="{ active: rotaAtual === '/horarios' }" @click="ir('/horarios')">
       <Clock3 :size="24"/>
       <span> Horários </span>
@@ -30,12 +25,12 @@
 
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import { CalendarDays, Bell, Clock3, Sparkles } from "lucide-vue-next";
+import { CalendarDays, Clock3, Sparkles } from "lucide-vue-next";
+import { computed } from "vue";
 
+const rotaAtual = computed(() => route.path);
 const router = useRouter();
 const route = useRoute();
-
-const rotaAtual = route.path;
 
 function ir(caminho) {
   router.push(caminho);

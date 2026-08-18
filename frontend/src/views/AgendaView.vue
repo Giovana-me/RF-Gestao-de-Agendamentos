@@ -123,7 +123,7 @@
 import { useToast } from 'vue-toastification'
 import { onMounted, ref } from 'vue'
 import FullCalendar from '@fullcalendar/vue3'
-import dayGridPlugin from '@fullcalendar/vue3/daygrid'
+import timeGridPlugin from '@fullcalendar/vue3/timegrid'
 import type { CalendarOptions, EventInput } from '@fullcalendar/vue3'
 
 import themePlugin from '@fullcalendar/vue3/themes/classic'
@@ -256,30 +256,22 @@ const eventos = ref<EventInput[]>([])
 const calendarRef = ref()
 
 const calendarOptions = ref<CalendarOptions>({
-  plugins: [dayGridPlugin, themePlugin],
-
-  initialView: 'dayGridMonth',
-
+  plugins: [timeGridPlugin, themePlugin],
+  initialView: 'timeGridWeek',
   locale: 'pt-br',
-
   firstDay: 0,
-
   headerToolbar: {
     left: 'prev',
     center: 'title',
     right: 'next'
   },
-
   eventTimeFormat: {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
   },
-
   eventClick: aoClicarNoEvento,
-
   eventMouseEnter: aoPassarMouseNoEvento,
-
   height: 'auto'
 })
 
