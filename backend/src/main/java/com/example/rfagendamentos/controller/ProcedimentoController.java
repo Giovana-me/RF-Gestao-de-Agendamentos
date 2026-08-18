@@ -1,7 +1,9 @@
 package com.example.rfagendamentos.controller;
 
+import com.example.rfagendamentos.dto.ProcedimentoDTO;
 import com.example.rfagendamentos.model.Procedimento;
 import com.example.rfagendamentos.service.ProcedimentoService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,8 +19,8 @@ public class ProcedimentoController {
     }
 
     @PostMapping
-    public Procedimento cadastrar(@RequestBody Procedimento procedimento) {
-        return procedimentoService.salvar(procedimento);
+    public Procedimento cadastrar(@Valid @RequestBody ProcedimentoDTO procedimentoDTO) {
+        return procedimentoService.salvar(procedimentoDTO);
     }
 
     @GetMapping
@@ -37,12 +39,17 @@ public class ProcedimentoController {
     }
 
     @PutMapping("/{id}")
-    public Procedimento atualizar(@PathVariable Long id, @RequestBody Procedimento procedimento) {
-        return procedimentoService.atualizar(id, procedimento);
+    public Procedimento atualizar(@PathVariable Long id,@Valid @RequestBody ProcedimentoDTO procedimentoDTO) {
+        return procedimentoService.atualizar(id, procedimentoDTO);
     }
 
     @DeleteMapping("/{id}")
     public void desativar(@PathVariable Long id) {
         procedimentoService.desativar(id);
+    }
+
+    @PatchMapping("/{id}/ativar")
+    public void ativar(@PathVariable Long id) {
+        procedimentoService.ativar(id);
     }
 }

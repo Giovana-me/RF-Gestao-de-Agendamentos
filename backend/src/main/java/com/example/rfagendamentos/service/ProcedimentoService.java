@@ -1,5 +1,6 @@
 package com.example.rfagendamentos.service;
 
+import com.example.rfagendamentos.dto.ProcedimentoDTO;
 import com.example.rfagendamentos.model.Procedimento;
 import com.example.rfagendamentos.repository.ProcedimentoRepository;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,12 @@ public class ProcedimentoService {
         this.procedimentoRepository = procedimentoRepository;
     }
 
-    public Procedimento salvar(Procedimento procedimento) {
+    public Procedimento salvar(ProcedimentoDTO dados) {
+        Procedimento procedimento = new Procedimento();
+        procedimento.setNome(dados.getNome());
+        procedimento.setDescricao(dados.getDescricao());
+        procedimento.setDuracao(dados.getDuracao());
+        procedimento.setValor(dados.getValor());
         procedimento.setAtivo(true);
         return procedimentoRepository.save(procedimento);
     }
@@ -32,7 +38,7 @@ public class ProcedimentoService {
                 .orElseThrow(() -> new RuntimeException("Procedimento não encontrado"));
     }
 
-    public Procedimento atualizar(Long id, Procedimento dadosAtualizados) {
+    public Procedimento atualizar(Long id, ProcedimentoDTO dadosAtualizados) {
         Procedimento procedimento = buscarPorId(id);
 
         procedimento.setNome(dadosAtualizados.getNome());
@@ -46,6 +52,12 @@ public class ProcedimentoService {
     public void desativar(Long id) {
         Procedimento procedimento = buscarPorId(id);
         procedimento.setAtivo(false);
+        procedimentoRepository.save(procedimento);
+    }
+
+    public void ativar(Long id) {
+        Procedimento procedimento = buscarPorId(id);
+        procedimento.setAtivo(true);
         procedimentoRepository.save(procedimento);
     }
 }
