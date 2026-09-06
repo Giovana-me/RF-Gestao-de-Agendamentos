@@ -13,16 +13,24 @@
           Escolha o horário desejado para o atendimento.
         </p>
 
+        <div v-if="carregando" class="mensagem-horarios">
+          Carregando horários...
+        </div>
+
+        <div v-else-if="horarios.length === 0" class="mensagem-horarios">
+          Nenhum horário disponível.
+        </div>
+
         <div class="time-grid">
           <button
-            v-for="hora in horarios"
-            :key="hora"
-            class="time-button"
-            :class="{ selected: horaSelecionada === hora }"
-            @click="horaSelecionada = hora"
+            v-for="horario in horarios"
+          :key="horario.id"
+          class="time-button"
+          :class="{ selected: horaSelecionada === horario.hora }"
+          @click="horaSelecionada = horario.hora"
           >
-            {{ hora }}
-          </button>
+          {{ horario.hora }}
+        </button>
         </div>
       </div>
       <div class="actions">
@@ -38,28 +46,39 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
 import Stepper from "../Stepper.vue";
 import { useToast } from "vue-toastification";
+import api from "@/services/api";
+import { onMounted, ref } from "vue";
 
 const toast = useToast();
 const emit = defineEmits(["fechar", "voltar", "continuar"]);
 
-const horarios = [
-  "08:00",
-  "09:00",
-  "10:00",
-  "11:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-  "18:00",
-  "19:00"
-];
+interface Horario {
+  id: number;
+  hora: string;
+  ativo: boolean;
+}
 
+const horarios = ref<Horario[]>([]);
 const horaSelecionada = ref("");
+const carregando = ref(false);
+
+async function carregarHorarios() {
+  carregando.value = true;
+  try {
+    const response = await api.get("/horarios");
+    horarios.value = response.data;
+  } catch (error) {
+    console.error("Erro ao carregar horários:", error);
+    toast.error(
+      "Não foi possível carregar os horários."
+    );
+  } finally {
+    carregando.value = false;
+  }
+}
 
 function continuar() {
   if (!horaSelecionada.value) {
@@ -69,6 +88,11 @@ function continuar() {
 
   emit("continuar", horaSelecionada.value);
 }
+
+onMounted(() => {
+  carregarHorarios();
+});
+
 </script>
 
 <style scoped>

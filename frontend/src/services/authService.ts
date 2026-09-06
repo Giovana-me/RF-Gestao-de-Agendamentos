@@ -30,6 +30,23 @@ export async function login(email: string, senha: string): Promise<UsuarioLogado
     return response.data;
 }
 
+export async function cadastrar(
+    nome: string,
+    email: string,
+    telefone: string,
+    cpf: string,
+    senha: string
+): Promise<void> {
+
+    await api.post("/auth/cadastro", {
+        nome,
+        email,
+        telefone,
+        cpf,
+        senha
+    });
+}
+
 export function salvarSessao(usuario: UsuarioLogado): void {
     sessionStorage.setItem("id", usuario.id.toString());
     sessionStorage.setItem("token", usuario.token);

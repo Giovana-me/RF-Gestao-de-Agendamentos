@@ -245,7 +245,11 @@ onMounted(() => {
 .procedures-section {
   position: relative;
   z-index: 10;
-  overflow: visible;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
 }
 
 .procedures-section h2 {
@@ -258,7 +262,6 @@ onMounted(() => {
 .procedures-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(200px, 1fr));
-  grid-template-rows: repeat(3, 145px);
   gap: 28px;
   position: relative;
   z-index: 10;

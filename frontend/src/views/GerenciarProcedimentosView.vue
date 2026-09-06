@@ -433,9 +433,12 @@ onMounted(() => {
 }
 
 .procedimentos-admin {
-  position: relative;
-  z-index: 10;
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .pagina-cabecalho {
@@ -444,6 +447,8 @@ onMounted(() => {
   align-items: flex-end;
   justify-content: space-between;
   gap: 20px;
+  flex-shrink: 0;
+  margin-bottom: 28px;
 }
 
 .pagina-cabecalho h1 {
@@ -502,8 +507,10 @@ onMounted(() => {
 
 .tabela-container {
   width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   overflow-x: auto;
-  border-radius: 26px;
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.22);
 }

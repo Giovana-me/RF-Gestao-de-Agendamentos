@@ -5,12 +5,18 @@ import LoginView from "../views/LoginView.vue";
 import { estaAutenticado, isCliente, isProprietaria } from "../services/authService";
 import AgendaView from "@/views/AgendaView.vue";
 import AdminLayout from "@/components/admin/AdminLayout.vue";
+import CadastroView from "../views/CadastroView.vue";
 
 const routes = [
   {
     path: "/login",
     name: "login",
     component: LoginView
+  },
+  {
+    path: "/cadastro",
+    name: "cadastro",
+    component: CadastroView
   },
   {
     path: "/",
@@ -43,6 +49,37 @@ const routes = [
         path: "",
         name: "procedimentos-admin",
         component: () => import("@/views/GerenciarProcedimentosView.vue")
+      }
+    ]
+  },
+  {
+    path: "/horarios-admin",
+    component: AdminLayout,
+    meta: {
+      requiresAuth: true,
+      role: "PROPRIETARIA"
+    },
+    children: [
+      {
+        path: "",
+        name: "horarios-admin",
+        component: () =>
+          import("@/views/GerenciarHorariosView.vue")
+      }
+    ]
+  },
+  {
+    path: "/clientes",
+    component: AdminLayout,
+    meta: {
+      requiresAuth: true,
+      role: "PROPRIETARIA"
+    },
+    children: [
+      {
+        path: "",
+        name: "clientes",
+        component: () => import("@/views/ClientesView.vue")
       }
     ]
   },

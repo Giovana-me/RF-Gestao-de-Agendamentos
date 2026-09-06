@@ -139,6 +139,10 @@ onMounted(() => {
   position: relative;
   z-index: 10;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .page-header {
@@ -161,9 +165,7 @@ onMounted(() => {
 .table-container {
   width: 100%;
   overflow-x: auto;
-  border-radius: 26px;
   background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.22);
 }
 
 .price-table {
@@ -240,23 +242,16 @@ onMounted(() => {
   top: 50%;
   right: 14px;
   transform: translateY(-50%);
-
   width: 28px;
   height: 28px;
-  padding: 0;
-
   border: none;
   border-radius: 50%;
-
   background-color: #ffeeee;
   color: #dd81b5;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
-
   transition:
     background-color 0.2s,
     transform 0.2s;

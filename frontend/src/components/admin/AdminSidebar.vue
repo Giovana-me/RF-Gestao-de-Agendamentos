@@ -5,7 +5,16 @@
       <span> Agenda </span>
     </button>
 
-    <button class="admin-menu-button" :class="{ active: rotaAtual === '/horarios' }" @click="ir('/horarios')">
+    <button
+      class="admin-menu-button"
+      :class="{ active: rotaAtual === '/clientes' }"
+      @click="ir('/clientes')"
+    >
+      <Users :size="24" />
+      <span>Clientes</span>
+    </button>
+
+    <button class="admin-menu-button" :class="{ active: rotaAtual === '/horarios-admin' }" @click="ir('/horarios-admin')">
       <Clock3 :size="24"/>
       <span> Horários </span>
     </button>
@@ -25,7 +34,7 @@
 
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import { CalendarDays, Clock3, Sparkles } from "lucide-vue-next";
+import { CalendarDays, Clock3, Sparkles, Users } from "lucide-vue-next";
 import { computed } from "vue";
 
 const rotaAtual = computed(() => route.path);

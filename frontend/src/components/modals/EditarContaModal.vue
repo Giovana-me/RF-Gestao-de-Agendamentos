@@ -187,7 +187,26 @@ async function carregarUsuario() {
     if (!usuarioLogado) {
         return;
     }
-    usuario.value = await buscarUsuarioPorId(usuarioLogado.id);
+
+    try {
+        const dados = await buscarUsuarioPorId(usuarioLogado.id);
+
+        usuario.value = {
+            ...dados,
+            endereco: dados.endereco ?? {
+                cep: "",
+                logradouro: "",
+                numero: "",
+                bairro: "",
+                cidade: "",
+                estado: ""
+            }
+        };
+
+    } catch (error) {
+        console.error(error);
+        toast.error("Não foi possível carregar os dados da conta.");
+    }
 }
 
 async function consultarCep() {

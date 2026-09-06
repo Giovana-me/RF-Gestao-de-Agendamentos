@@ -348,15 +348,22 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .agenda-card {
   width: 100%;
   background: #ffffff;
-  border-radius: 16px;
-  padding: 28px;
+  padding: 8px;
   box-sizing: border-box;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .agenda-toolbar {
@@ -364,6 +371,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
+  flex-shrink: 0;
 }
 
 .agenda-toolbar h2 {
@@ -375,6 +383,10 @@ onMounted(() => {
 
 .agenda-calendar {
   width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .agenda-modal-overlay {
@@ -544,15 +556,10 @@ onMounted(() => {
   border-color: #94335c;
 }
 
-/* Cor de fundo dia atual */
 .fc-classic-hbn {
   background-color: #f0c5d6 !important;
 }
 
-/* Cor da bolinha*/
-/*.fc-classic-lNM {
-  border-color: #94335c;
-}*/
 
 :deep(.fc-toolbar-title) {
   font-size: 20px !important;
@@ -560,8 +567,6 @@ onMounted(() => {
   text-transform: capitalize;
   color: black !important;
 }
-
-/* Botões */
 
 :deep(.fc-button) {
   border: none !important;
@@ -581,8 +586,6 @@ onMounted(() => {
   box-shadow: none !important;
 }
 
-/* Cabeçalho dos dias */
-
 :deep(.fc-col-header-cell) {
   background: #f8f8f8;
   border-color: #eeeeee !important;
@@ -596,8 +599,6 @@ onMounted(() => {
   text-transform: uppercase;
 }
 
-/* Células */
-
 :deep(.fc-daygrid-day) {
   min-height: 110px;
   border-color: #eeeeee !important;
@@ -609,16 +610,12 @@ onMounted(() => {
   background: #fafafa;
 }
 
-/* Número do dia */
-
 :deep(.fc-daygrid-day-number) {
   padding: 10px !important;
   font-size: 13px;
   font-weight: 500;
   text-decoration: none;
 }
-
-/* Dia atual */
 
 :deep(.fc-day-today) {
   background: rgba(245, 240, 235, 0.65) !important;
@@ -627,8 +624,6 @@ onMounted(() => {
 :deep(.fc-day-today .fc-daygrid-day-number) {
   font-weight: 700;
 }
-
-/* Eventos */
 
 :deep(.fc-daygrid-event) {
   border: none !important;
@@ -644,22 +639,16 @@ onMounted(() => {
   white-space: normal;
 }
 
-/* Hora */
-
 :deep(.fc-event-time) {
   font-size: 11px;
   font-weight: 600;
 }
-
-/* Mais eventos */
 
 :deep(.fc-more-link) {
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
 }
-
-/* Bordas gerais */
 
 :deep(.fc-scrollgrid) {
   border-radius: 10px;

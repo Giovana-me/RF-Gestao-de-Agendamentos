@@ -8,6 +8,10 @@ body,
   margin: 0;
 }
 
+body {
+  overflow: hidden;
+}
+
 #app {
   font-weight: normal;
 }

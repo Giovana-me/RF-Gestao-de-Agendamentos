@@ -47,6 +47,10 @@
       >
         {{ erro }}
       </p>
+      <p class="cadastro-link">
+        Ainda não possui uma conta?
+        <span @click="irParaCadastro">Cadastre-se</span>
+      </p>
 
     </div>
   </div>
@@ -61,6 +65,10 @@ const email = ref("");
 const senha = ref("");
 const erro = ref("");
 const router = useRouter();
+
+function irParaCadastro() {
+  router.push("/cadastro");
+}
 
 async function realizarLogin() {
   erro.value = "";
@@ -88,26 +96,56 @@ async function realizarLogin() {
     height: 100%;
     display:flex;
     background:#ffeeee;
+    overflow: hidden;
 }
 
-img {
-    width: 100%;
-    
+.image-container {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .login-card{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    background:#ffeeee;
-    padding: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 50%;
+  height: 100%;
+  box-sizing: border-box;
+  background: #ffeeee;
+  padding: 60px 100px;
+  overflow: hidden;
 }
 
 h1{
     text-align:center;
     margin-bottom:10px;
     color: black;
+}
+
+.cadastro-link {
+  text-align: center;
+  margin-top: 20px;
+  color: black;
+}
+
+.cadastro-link span {
+  color: #94335c;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cadastro-link span:hover {
+  text-decoration: underline;
 }
 
 .subtitle{
