@@ -3,8 +3,11 @@ package com.example.rfagendamentos.controller;
 import com.example.rfagendamentos.dto.AlterarEmailDTO;
 import com.example.rfagendamentos.dto.AlterarSenhaDTO;
 import com.example.rfagendamentos.dto.AtualizarContaDTO;
+import com.example.rfagendamentos.dto.CadastroRequest;
+import com.example.rfagendamentos.dto.ClienteResponseDTO;
 import com.example.rfagendamentos.model.Usuario;
 import com.example.rfagendamentos.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +16,7 @@ import java.util.List;
 @RequestMapping("/usuarios")
 @CrossOrigin(origins = "http://localhost:5173")
 public class UsuarioController {
+
     private final UsuarioService usuarioService;
 
     public UsuarioController(UsuarioService usuarioService) {
@@ -20,8 +24,8 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public Usuario cadastrar(@RequestBody Usuario usuario) {
-        return usuarioService.salvar(usuario);
+    public Usuario cadastrar(@Valid @RequestBody CadastroRequest request) {
+        return usuarioService.cadastrar(request);
     }
 
     @GetMapping
@@ -35,7 +39,10 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public Usuario atualizarConta(@PathVariable Long id, @RequestBody AtualizarContaDTO usuario) {
+    public Usuario atualizarConta(
+            @PathVariable Long id,
+            @RequestBody AtualizarContaDTO usuario) {
+
         return usuarioService.atualizarConta(id, usuario);
     }
 
@@ -43,6 +50,7 @@ public class UsuarioController {
     public Usuario alterarEmail(
             @PathVariable Long id,
             @RequestBody AlterarEmailDTO dto) {
+
         return usuarioService.alterarEmail(id, dto);
     }
 
@@ -60,7 +68,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/clientes")
-    public List<Usuario> listarClientes() {
+    public List<ClienteResponseDTO> listarClientes() {
         return usuarioService.listarClientes();
     }
 }

@@ -10,7 +10,9 @@ import com.example.rfagendamentos.repository.ProcedimentoRepository;
 import com.example.rfagendamentos.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AgendamentoService {
@@ -120,5 +122,34 @@ public class AgendamentoService {
                 .stream()
                 .map(this::converterParaAgenda)
                 .toList();
+    }
+
+    public List<Agendamento> listarRecentesPorCliente(Long clienteId) {
+        Usuario cliente = usuarioRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        LocalDate limite = LocalDate.now().minusMonths(1);
+
+        return agendamentoRepository.findByCliente(cliente)
+                .stream()
+                .filter(a -> {
+                    LocalDate data = LocalDate.parse(a.getData());
+                    return !data.isBefore(limite)
+                            && a.getStatus() != StatusAgendamento.CANCELADO;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<Agendamento> listarHistoricoPorCliente(Long clienteId) {
+        Usuario cliente = usuarioRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        LocalDate limite = LocalDate.now().minusMonths(1);
+        return agendamentoRepository.findByCliente(cliente)
+                .stream()
+                .filter(a -> {
+                    LocalDate data = LocalDate.parse(a.getData());
+                    return data.isBefore(limite)
+                            && a.getStatus() == StatusAgendamento.CONCLUIDO;
+                })
+                .collect(Collectors.toList());
     }
 }

@@ -11,4 +11,6 @@ public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> 
     List<Solicitacao> findByCliente(Usuario cliente);
 
     List<Solicitacao> findByStatus(StatusSolicitacao status);
+
+    List<Solicitacao> findByClienteAndAtivoTrue(Usuario cliente);
 }

@@ -1,8 +1,20 @@
 package com.example.rfagendamentos.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
 public class AtualizarContaDTO {
+    @NotBlank(message = "O nome é obrigatório.")
     private String nome;
+
+    @NotBlank(message = "O telefone é obrigatório.")
+    @Pattern(
+            regexp = "^\\d{10,11}$",
+            message = "Informe um telefone válido."
+    )
     private String telefone;
+
+    @NotBlank(message = "O CPF é obrigatório.")
     private String cpf;
     private EnderecoDTO endereco;
 

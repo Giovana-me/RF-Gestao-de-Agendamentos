@@ -62,4 +62,14 @@ public class AgendamentoController {
     public List<AgendaEventoDTO> listarConfirmados() {
         return agendamentoService.listarConfirmadosParaAgenda();
     }
+
+    @GetMapping("/cliente/{clienteId}/recentes")
+    public List<Agendamento> listarRecentesPorCliente(@PathVariable Long clienteId) {
+        return agendamentoService.listarRecentesPorCliente(clienteId);
+    }
+
+    @GetMapping("/cliente/{clienteId}/historico")
+    public List<Agendamento> listarHistoricoPorCliente(@PathVariable Long clienteId) {
+        return agendamentoService.listarHistoricoPorCliente(clienteId);
+    }
 }

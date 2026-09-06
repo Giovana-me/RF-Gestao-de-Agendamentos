@@ -74,8 +74,23 @@ public class SolicitacaoController {
         return solicitacaoService.cancelar(id);
     }
 
+    @PatchMapping("/{id}/inativar")
+    public void inativar(@PathVariable Long id) {
+        solicitacaoService.inativar(id);
+    }
+
     @GetMapping("/pendentes/agenda")
     public List<AgendaEventoDTO> listarPendentesParaAgenda() {
         return solicitacaoService.listarPendentesParaAgenda();
+    }
+
+    @GetMapping("/cliente/{clienteId}/recentes")
+    public List<Solicitacao> listarRecentesPorCliente(@PathVariable Long clienteId) {
+        return solicitacaoService.listarRecentesPorCliente(clienteId);
+    }
+
+    @GetMapping("/cliente/{clienteId}/historico")
+    public List<Solicitacao> listarHistoricoPorCliente(@PathVariable Long clienteId) {
+        return solicitacaoService.listarHistoricoPorCliente(clienteId);
     }
 }

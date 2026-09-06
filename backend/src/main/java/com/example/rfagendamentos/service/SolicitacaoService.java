@@ -8,7 +8,9 @@ import com.example.rfagendamentos.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import com.example.rfagendamentos.dto.AgendaEventoDTO;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SolicitacaoService {
@@ -62,7 +64,7 @@ public class SolicitacaoService {
         Usuario cliente = usuarioRepository.findById(clienteId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        return solicitacaoRepository.findByCliente(cliente);
+        return solicitacaoRepository.findByClienteAndAtivoTrue(cliente);
     }
 
     public Solicitacao buscarPorId(Long id) {
@@ -161,5 +163,61 @@ public class SolicitacaoService {
                 .stream()
                 .map(this::converterParaAgenda)
                 .toList();
+    }
+
+    public void inativar(Long id) {
+        Solicitacao solicitacao = buscarPorId(id);
+        if (solicitacao.getStatus() != StatusSolicitacao.RECUSADA &&
+                solicitacao.getStatus() != StatusSolicitacao.CANCELADA) {
+            throw new RuntimeException(
+                    "Somente solicitações recusadas ou canceladas podem ser excluídas."
+            );
+        }
+        solicitacao.setAtivo(false);
+        solicitacaoRepository.save(solicitacao);
+    }
+
+    public List<Solicitacao> listarRecentesPorCliente(Long clienteId) {
+        Usuario cliente = usuarioRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        LocalDate limite = LocalDate.now().minusMonths(1);
+
+        return solicitacaoRepository.findByClienteAndAtivoTrue(cliente)
+                .stream()
+                .filter(s -> {
+                    if (s.getStatus() == StatusSolicitacao.PENDENTE) {
+                        return true;
+                    }
+
+                    if (s.getDataDesejada() == null) {
+                        return true;
+                    }
+
+                    LocalDate data = LocalDate.parse(s.getDataDesejada());
+                    return !data.isBefore(limite);
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<Solicitacao> listarHistoricoPorCliente(Long clienteId) {
+        Usuario cliente = usuarioRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        LocalDate limite = LocalDate.now().minusMonths(1);
+
+        return solicitacaoRepository.findByClienteAndAtivoTrue(cliente)
+                .stream()
+                .filter(s -> {
+                    if (s.getStatus() == StatusSolicitacao.PENDENTE) {
+                        return false;
+                    }
+
+                    if (s.getDataDesejada() == null) {
+                        return false;
+                    }
+                    LocalDate data = LocalDate.parse(s.getDataDesejada());
+                    return data.isBefore(limite);
+                })
+                .collect(Collectors.toList());
     }
 }

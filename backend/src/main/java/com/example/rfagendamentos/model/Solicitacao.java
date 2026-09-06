@@ -16,6 +16,9 @@ public class Solicitacao {
     @Column(length = 1000)
     private String observacao;
 
+    @Column(nullable = false)
+    private Boolean ativo = true;
+
     @Enumerated(EnumType.STRING)
     private TipoSolicitacao tipoSolicitacao;
 
@@ -33,13 +36,14 @@ public class Solicitacao {
     public Solicitacao() {
     }
 
-    public Solicitacao(Long id, String dataDesejada, String horaDesejada, String observacao,
+    public Solicitacao(Long id, String dataDesejada, String horaDesejada, String observacao, Boolean ativo,
                        TipoSolicitacao tipoSolicitacao, StatusSolicitacao status,
                        Usuario cliente, Procedimento procedimento) {
         this.id = id;
         this.dataDesejada = dataDesejada;
         this.horaDesejada = horaDesejada;
         this.observacao = observacao;
+        this.ativo = ativo;
         this.tipoSolicitacao = tipoSolicitacao;
         this.status = status;
         this.cliente = cliente;
@@ -60,6 +64,10 @@ public class Solicitacao {
 
     public String getObservacao() {
         return observacao;
+    }
+
+    public Boolean getAtivo() {
+        return ativo;
     }
 
     public TipoSolicitacao getTipoSolicitacao() {
@@ -92,6 +100,10 @@ public class Solicitacao {
 
     public void setObservacao(String observacao) {
         this.observacao = observacao;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
     }
 
     public void setTipoSolicitacao(TipoSolicitacao tipoSolicitacao) {

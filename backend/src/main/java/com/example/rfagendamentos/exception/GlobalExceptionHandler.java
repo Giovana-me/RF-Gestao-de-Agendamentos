@@ -11,6 +11,7 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> tratarErrosValidacao(
             MethodArgumentNotValidException ex) {
@@ -29,5 +30,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(erros);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> tratarErroRuntime(
+            RuntimeException ex) {
+
+        Map<String, String> erro = new LinkedHashMap<>();
+
+        erro.put("erro", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(erro);
     }
 }
