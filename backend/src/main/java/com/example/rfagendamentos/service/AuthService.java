@@ -55,7 +55,9 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
 
-        Usuario usuario = usuarioService.buscarPorEmail(request.getEmail());
+        String email = request.getEmail().trim();
+
+        Usuario usuario = usuarioService.buscarPorEmail(email);
 
         if (!usuario.getAtivo()) {
             throw new AuthenticationException("Usuário desativado.");
@@ -73,7 +75,10 @@ public class AuthService {
             );
         }
 
-        String token = jwtService.gerarToken(usuario.getEmail());
+        String token = jwtService.gerarToken(
+                usuario.getEmail(),
+                usuario.getVersaoToken()
+        );
 
         return new LoginResponse(
                 usuario.getId(),

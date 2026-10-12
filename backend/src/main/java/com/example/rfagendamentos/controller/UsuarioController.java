@@ -1,13 +1,10 @@
 package com.example.rfagendamentos.controller;
 
-import com.example.rfagendamentos.dto.AlterarEmailDTO;
-import com.example.rfagendamentos.dto.AlterarSenhaDTO;
-import com.example.rfagendamentos.dto.AtualizarContaDTO;
-import com.example.rfagendamentos.dto.CadastroRequest;
-import com.example.rfagendamentos.dto.ClienteResponseDTO;
+import com.example.rfagendamentos.dto.*;
 import com.example.rfagendamentos.model.Usuario;
 import com.example.rfagendamentos.service.UsuarioService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,12 +43,21 @@ public class UsuarioController {
         return usuarioService.atualizarConta(id, usuario);
     }
 
-    @PutMapping("/{id}/email")
-    public Usuario alterarEmail(
+    @PostMapping("/{id}/email/solicitar")
+    public void solicitarAlteracaoEmail(
             @PathVariable Long id,
             @RequestBody AlterarEmailDTO dto) {
 
-        return usuarioService.alterarEmail(id, dto);
+        usuarioService.solicitarAlteracaoEmail(id, dto);
+    }
+
+    @PostMapping("/{id}/email/confirmar")
+    public ResponseEntity<LoginResponse> confirmarAlteracaoEmail(
+            @PathVariable Long id,
+            @RequestBody ConfirmarAlteracaoEmailDTO dto
+    ) {
+        LoginResponse response = usuarioService.confirmarAlteracaoEmail(id, dto);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}/senha")
@@ -70,5 +76,18 @@ public class UsuarioController {
     @GetMapping("/clientes")
     public List<ClienteResponseDTO> listarClientes() {
         return usuarioService.listarClientes();
+    }
+
+    @PostMapping("/{id}/senha/solicitar")
+    public ResponseEntity<Void> solicitarAlteracaoSenha(@PathVariable Long id, @RequestBody AlterarSenhaDTO dto) {
+        usuarioService.solicitarAlteracaoSenha(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/senha/confirmar")
+    public ResponseEntity<Void> confirmarAlteracaoSenha(
+            @PathVariable Long id, @RequestBody ConfirmarAlteracaoSenhaDTO dto) {
+        usuarioService.confirmarAlteracaoSenha(id, dto);
+        return ResponseEntity.ok().build();
     }
 }

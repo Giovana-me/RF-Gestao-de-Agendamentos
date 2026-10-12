@@ -15,14 +15,19 @@ public class DataInitializer {
     @Bean
     CommandLineRunner criarProprietaria(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (usuarioRepository.findByEmail("adminrf@gmail.com").isPresent()) {
+            if (usuarioRepository.findByEmail("amoragns2406@gmail.com").isPresent()) {
                 return;
             }
+            if (usuarioRepository.findByCpf("00000000000").isPresent()) {
+                return;
+            }
+
             Usuario proprietaria = new Usuario();
             Endereco endereco = new Endereco();
+
             proprietaria.setNome("Rosangela Fernandes");
-            proprietaria.setEmail("adminrf@gmail.com");
-            proprietaria.setSenha(passwordEncoder.encode("186519"));
+            proprietaria.setEmail("amoragns2406@gmail.com");
+            proprietaria.setSenha(passwordEncoder.encode("Admin23&"));
             proprietaria.setTelefone("(43) 99149-4105");
             proprietaria.setCpf("00000000000");
 

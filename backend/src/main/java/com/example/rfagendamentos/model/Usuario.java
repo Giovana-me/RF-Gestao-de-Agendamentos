@@ -30,10 +30,12 @@ public class Usuario {
 
     private Boolean ativo = true;
 
+    @Column(nullable = false)
+    private Long versaoToken = 0L;
+
     public Usuario() {}
 
-    public Usuario(Long id, String nome, String email, String senha, String telefone,
-                   String cpf, Endereco endereco, TipoUsuario tipoUsuario, Boolean ativo) {
+    public Usuario(Long id, String nome, String email, String senha, String telefone, String cpf, Endereco endereco, TipoUsuario tipoUsuario, Boolean ativo, Long versaoToken) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -43,6 +45,7 @@ public class Usuario {
         this.endereco = endereco;
         this.tipoUsuario = tipoUsuario;
         this.ativo = ativo;
+        this.versaoToken = versaoToken;
     }
 
     public Long getId() { return id; }
@@ -63,6 +66,10 @@ public class Usuario {
 
     public Boolean getAtivo() { return ativo; }
 
+    public Long getVersaoToken() {
+        return versaoToken;
+    }
+
     public void setId(Long id) { this.id = id; }
 
     public void setNome(String nome) { this.nome = nome; }
@@ -80,4 +87,8 @@ public class Usuario {
     public void setTipoUsuario(TipoUsuario tipoUsuario) { this.tipoUsuario = tipoUsuario; }
 
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+
+    public void setVersaoToken(Long versaoToken) {
+        this.versaoToken = versaoToken;
+    }
 }

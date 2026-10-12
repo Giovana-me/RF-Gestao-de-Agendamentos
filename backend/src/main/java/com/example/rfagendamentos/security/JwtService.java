@@ -24,13 +24,24 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String gerarToken(String email) {
+    public String gerarToken(String email, Long versaoToken) {
         return Jwts.builder()
                 .subject(email)
+                .claim("versaoToken", versaoToken)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignKey())
                 .compact();
+    }
+
+    public Long extrairVersaoToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSignKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("versaoToken", Long.class);
     }
 
     public String extrairEmail(String token) {
@@ -43,20 +54,22 @@ public class JwtService {
         return claims.getSubject();
     }
 
-    private boolean tokenExpirado(String token) {
+    public boolean tokenValido(String token, String email, Long versaoTokenAtual) {
         Claims claims = Jwts.parser()
                 .verifyWith(getSignKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
 
-        return claims.getExpiration().before(new Date());
-    }
+        String emailToken = claims.getSubject();
+        Long versaoToken = claims.get("versaoToken", Long.class);
+        Date expiracao = claims.getExpiration();
 
-    public boolean tokenValido(String token, String email) {
-        String emailToken = extrairEmail(token);
-
-        return emailToken.equals(email)
-                && !tokenExpirado(token);
+        return emailToken != null
+                && emailToken.equals(email)
+                && versaoToken != null
+                && versaoToken.equals(versaoTokenAtual)
+                && expiracao != null
+                && expiracao.after(new Date());
     }
 }

@@ -44,6 +44,7 @@ public class SolicitacaoService {
         solicitacao.setCliente(cliente);
         solicitacao.setProcedimento(procedimento);
         solicitacao.setStatus(StatusSolicitacao.PENDENTE);
+        solicitacao.setAtivo(true);
 
         if (solicitacao.getTipoSolicitacao() == null) {
             solicitacao.setTipoSolicitacao(TipoSolicitacao.NOVO_AGENDAMENTO);
