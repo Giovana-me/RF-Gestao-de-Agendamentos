@@ -1,75 +1,174 @@
 <template>
-  <header class="cliente-header">
-    <div class="cliente-user-area">
-      <div class="cliente-avatar">
-        <UserRound :size="36" />
-      </div>
+    <header class="cliente-header">
+        <div class="cliente-user-area">
+            <div class="cliente-avatar">
+                <UserRound :size="36" />
+            </div>
+            <div>
+                <h1>{{ nomeUsuario }}</h1>
+                <button class="cliente-edit-button" @click="abrirModal">
+                    <Pencil :size="18" />
+                    Editar
+                </button>
+            </div>
+        </div>
 
-      <div>
-        <h1>{{ nomeUsuario }}</h1>
-        <button class="cliente-edit-button" @click="abrirModal">
-          <Pencil :size="18" />
-          Editar
+        <button class="cliente-logout-button" @click="realizarLogout">
+            <LogOut :size="22" />
         </button>
-      </div>
-    </div>
+    </header>
 
-    <button class="cliente-logout-button" @click="realizarLogout">
-      <LogOut :size="22" />
-    </button>
-  </header>
-  <EditarContaModal
-    :visivel="modalAberto"
-    @fechar="fecharModal"
-    @salvar="salvarConta"
-    @alterarEmail="abrirAlteracaoEmail"
-    @alterarSenha="abrirAlteracaoSenha"
-/>
-<AlterarEmailModal
-    :visivel="modalAlterarEmail"
-    @fechar="fecharAlteracaoEmail"
-    @confirmar="confirmarAlteracaoEmail"
-/>
-<AlterarSenhaModal
+    <EditarContaModal
+        :visivel="modalAberto"
+        @fechar="fecharModal"
+        @salvar="salvarConta"
+        @alterarEmail="abrirAlteracaoEmail"
+        @alterarSenha="abrirAlteracaoSenha"
+    />
+
+    <AlterarEmailModal
+        ref="alterarEmailModalRef"
+        :visivel="modalAlterarEmail"
+        :email-atual="emailUsuario"
+        @fechar="fecharAlteracaoEmail"
+        @solicitar="solicitarAlteracaoEmailUsuario"
+        @confirmar="confirmarAlteracaoEmailUsuario"
+    />
+
+    <AlterarSenhaModal
+    ref="alterarSenhaModalRef"
     :visivel="modalAlterarSenha"
     @fechar="fecharAlteracaoSenha"
-    @confirmar="confirmarAlteracaoSenha"
+    @solicitar="solicitarAlteracaoSenhaUsuario"
+    @confirmar="confirmarAlteracaoSenhaUsuario"
 />
 </template>
 
 <script setup lang="ts">
-
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { atualizarSessao } from "../../services/authService.ts";
-import { getUsuarioLogado, logout } from "../../services/authService.ts";
-import { atualizarUsuario } from "../../services/usuarioService.ts";
+import {
+    atualizarSessao,
+    getUsuarioLogado,
+    logout
+} from "../../services/authService.ts";
+import {
+    atualizarUsuario,
+    solicitarAlteracaoEmail,
+    confirmarAlteracaoEmail,
+    solicitarAlteracaoSenha,
+    confirmarAlteracaoSenha
+} from "../../services/usuarioService.ts";
 import EditarContaModal from "../modals/EditarContaModal.vue";
 import { useToast } from "vue-toastification";
 import { UserRound, Pencil, LogOut } from "lucide-vue-next";
 import type { AtualizarContaDTO } from "../../services/usuarioService.ts";
 import AlterarEmailModal from "../modals/AlterarEmailModal.vue";
-import { alterarEmail } from "../../services/usuarioService";
 import AlterarSenhaModal from "../modals/AlterarSenhaModal.vue";
-import { alterarSenha } from "../../services/usuarioService";
 
 const router = useRouter();
 const nomeUsuario = ref("");
+const emailUsuario = ref("");
 const modalAberto = ref(false);
 const toast = useToast();
 const modalAlterarEmail = ref(false);
 const modalAlterarSenha = ref(false);
 
+const alterarEmailModalRef = ref<InstanceType<typeof AlterarEmailModal> | null>(null);
+const alterarSenhaModalRef = ref<InstanceType<typeof AlterarSenhaModal> | null>(null);
+
 onMounted(() => {
     const usuario = getUsuarioLogado();
+
     if (usuario) {
         nomeUsuario.value = usuario.nome;
+        emailUsuario.value = usuario.email;
     }
 });
+
+async function confirmarAlteracaoSenhaUsuario(dados: {
+    codigo: string;
+}) {
+    try {
+        const usuario = getUsuarioLogado();
+
+        if (!usuario) {
+            return;
+        }
+
+        await confirmarAlteracaoSenha(
+            usuario.id,
+            {
+                codigo: dados.codigo
+            }
+        );
+
+        alterarSenhaModalRef.value?.alteracaoConfirmada();
+
+        logout();
+
+        toast.success(
+            "Senha alterada com sucesso. Faça login novamente."
+        );
+
+        router.push("/login");
+    } catch (error) {
+        console.error(error);
+
+        toast.error(
+            "Não foi possível confirmar a alteração da senha."
+        );
+    }
+}
+
+async function solicitarAlteracaoSenhaUsuario(dados: {
+    senhaAtual: string;
+    novaSenha: string;
+}) {
+
+    try {
+
+        const usuario = getUsuarioLogado();
+
+        if (!usuario) {
+            return;
+        }
+
+        await solicitarAlteracaoSenha(
+            usuario.id,
+            {
+                senhaAtual: dados.senhaAtual,
+                novaSenha: dados.novaSenha
+            }
+        );
+
+        alterarSenhaModalRef.value?.codigoEnviado();
+
+        toast.success(
+            "Código de confirmação enviado para seu e-mail!"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        toast.error(
+            "Não foi possível enviar o código de confirmação."
+        );
+
+    }
+
+}
 
 function abrirAlteracaoEmail() {
     modalAberto.value = false;
     modalAlterarEmail.value = true;
+
+    const usuario = getUsuarioLogado();
+
+    if (usuario) {
+        emailUsuario.value = usuario.email;
+    }
 }
 
 function fecharAlteracaoEmail() {
@@ -77,39 +176,79 @@ function fecharAlteracaoEmail() {
     modalAberto.value = true;
 }
 
-async function confirmarAlteracaoEmail(dados: {
-    email: string;
-    senha: string;
+async function solicitarAlteracaoEmailUsuario(dados: {
+    novoEmail: string;
+    senhaAtual: string;
 }) {
     try {
         const usuario = getUsuarioLogado();
+
         if (!usuario) {
             return;
         }
-        const usuarioAtualizado = await alterarEmail(
-          usuario.id,
-          {
-            novoEmail: dados.email,
-            senhaAtual: dados.senha
-          }
+
+        await solicitarAlteracaoEmail(
+            usuario.id,
+            {
+                novoEmail: dados.novoEmail,
+                senhaAtual: dados.senhaAtual
+            }
+        );
+
+        alterarEmailModalRef.value?.codigoEnviado();
+
+        toast.success(
+            "Código de confirmação enviado para seu novo e-mail!"
+        );
+    } catch (error) {
+        console.error(error);
+        toast.error(
+            "Não foi possível enviar o código de confirmação."
+        );
+    }
+}
+
+async function confirmarAlteracaoEmailUsuario(dados: {
+    codigo: string;
+}) {
+    try {
+        const usuario = getUsuarioLogado();
+
+        if (!usuario) {
+            return;
+        }
+
+        const usuarioAtualizado = await confirmarAlteracaoEmail(
+            usuario.id,
+            {
+                codigo: dados.codigo
+            }
         );
 
         const sessaoAtualizada = {
             ...usuario,
+            id: usuarioAtualizado.id,
             nome: usuarioAtualizado.nome,
             email: usuarioAtualizado.email,
             telefone: usuarioAtualizado.telefone,
-            endereco: usuarioAtualizado.endereco
+            endereco: usuarioAtualizado.endereco,
+            tipoUsuario: usuarioAtualizado.tipoUsuario,
+            token: usuarioAtualizado.token
         };
 
         atualizarSessao(sessaoAtualizada);
 
-        toast.success("E-mail alterado com sucesso!");
-        fecharAlteracaoEmail();
+        nomeUsuario.value = usuarioAtualizado.nome;
+        emailUsuario.value = usuarioAtualizado.email;
 
+        alterarEmailModalRef.value?.alteracaoConfirmada();
+
+        toast.success("E-mail alterado com sucesso!");
     } catch (error) {
         console.error(error);
-        toast.error("Não foi possível alterar o e-mail.");
+        toast.error(
+            "Não foi possível confirmar a alteração do e-mail."
+        );
     }
 }
 
@@ -123,66 +262,37 @@ function fecharAlteracaoSenha() {
     modalAberto.value = true;
 }
 
-async function confirmarAlteracaoSenha(dados: {
-    senhaAtual: string;
-    novaSenha: string;
-}) {
+async function salvarConta(dados: AtualizarContaDTO) {
     try {
+        const usuarioLogado = getUsuarioLogado();
 
-        const usuario = getUsuarioLogado();
-
-        if (!usuario) {
+        if (!usuarioLogado) {
             return;
         }
 
-        await alterarSenha(
-            usuario.id,
-            {
-                senhaAtual: dados.senhaAtual,
-                novaSenha: dados.novaSenha
-            }
+        const usuarioAtualizado = await atualizarUsuario(
+            usuarioLogado.id,
+            dados
         );
 
-        toast.success("Senha alterada com sucesso!");
+        const sessaoAtualizada = {
+            ...usuarioLogado,
+            nome: usuarioAtualizado.nome,
+            telefone: usuarioAtualizado.telefone,
+            endereco: usuarioAtualizado.endereco
+        };
 
-        fecharAlteracaoSenha();
-
-    } catch (error) {
-        console.error(error);
-        toast.error("Não foi possível alterar a senha.");
-    }
-}
-
-async function salvarConta(dados: AtualizarContaDTO) {
-    try {
-      const usuarioLogado = getUsuarioLogado();
-      if (!usuarioLogado) {
-          return;
-      }
-      const usuarioAtualizado = await atualizarUsuario(
-        usuarioLogado.id,
-        dados 
-      );
-
-      const sessaoAtualizada = {
-        ...usuarioLogado,
-        nome: usuarioAtualizado.nome,
-        telefone: usuarioAtualizado.telefone,
-        endereco: usuarioAtualizado.endereco
-      };
-        
         atualizarSessao(sessaoAtualizada);
 
         nomeUsuario.value = usuarioAtualizado.nome;
 
         fecharModal();
 
-        toast.success("Conta atualizada com sucesso!")
-
-      } catch (error) {
+        toast.success("Conta atualizada com sucesso!");
+    } catch (error) {
         console.error(error);
-        toast.error("Não foi possível atualizar a conta.")
-      }
+        toast.error("Não foi possível atualizar a conta.");
+    }
 }
 
 function realizarLogout() {
@@ -190,12 +300,11 @@ function realizarLogout() {
     router.push("/login");
 }
 
-function abrirModal(){
+function abrirModal() {
     modalAberto.value = true;
 }
 
-function fecharModal(){
+function fecharModal() {
     modalAberto.value = false;
 }
-
 </script>

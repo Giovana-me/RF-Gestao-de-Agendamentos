@@ -34,4 +34,29 @@ a,
     z-index: 999999 !important;
 }
 
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #c68fa5;
+  border-radius: 10px;
+  border: 2px solid #f5f5f5;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #94335c;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c68fa5 #f5f5f5;
+}
+
 

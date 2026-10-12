@@ -1,10 +1,21 @@
-```vue
 <template>
   <ClienteLayout>
-    <h2>Minhas solicitações e agendamentos</h2>
-    <p class="subtitle">
-      Acompanhe suas solicitações de agendamento e seus respectivos status.
-    </p>
+    <div class="pagina-cabecalho">
+      <div>
+        <h2>Minhas solicitações e agendamentos</h2>
+        <p class="subtitle">
+          Acompanhe suas solicitações de agendamento e seus respectivos status.
+        </p>
+      </div>
+
+      <button
+        class="historico-button"
+        @click="abrirHistorico"
+        :disabled="carregandoHistorico"
+      >
+        {{ carregandoHistorico ? "Carregando..." : "Ver histórico" }}
+      </button>
+    </div>
 
     <p v-if="carregando" class="message">Carregando...</p>
     <p v-else-if="erro" class="message error">{{ erro }}</p>
@@ -186,131 +197,56 @@
           </div>
         </div>
       </section>
+    </div>
+    <div v-if="mostrarHistorico" class="modal-overlay">
+      <div class="modal modal-historico">
+        <div class="modal-cabecalho">
+          <h2>Histórico de agendamentos</h2>
 
-      <div class="historico-button-container">
-        <button
-          class="historico-button"
-          @click="carregarHistorico"
-          :disabled="carregandoHistorico"
-        >
-          {{
-            carregandoHistorico
-              ? "Carregando..."
-              : mostrarHistorico
-                ? "Ocultar histórico"
-                : "Ver histórico"
-          }}
-        </button>
-      </div>
-
-      <div v-if="mostrarHistorico" class="historico-content">
-        <section class="historico-section">
-          <h3 class="section-title">Histórico de solicitações</h3>
-
-          <div
-            v-if="historicoSolicitacoes.length > 0"
-            class="cards-wrapper"
+          <button
+            class="btn-fechar"
+            @click="fecharHistorico"
           >
-            <div class="cards">
-              <article
-                v-for="solicitacao in historicoSolicitacoes"
-                :key="solicitacao.id"
-                class="request-card historico-card"
-              >
-                <div class="card-top">
-                  <h3>{{ solicitacao.procedimento?.nome }}</h3>
-                  <span
-                    class="status"
-                    :class="classeStatus(solicitacao.status)"
-                  >
-                    {{ formatarStatus(solicitacao.status) }}
-                  </span>
-                </div>
+            ×
+          </button>
+        </div>
 
-                <div class="info-list">
-                  <p>
-                    <strong>Data:</strong>
-                    {{ formatarData(solicitacao.dataDesejada) }}
-                  </p>
-                  <p>
-                    <strong>Horário:</strong>
-                    {{ solicitacao.horaDesejada }}
-                  </p>
-                  <p>
-                    <strong>Duração:</strong>
-                    {{ solicitacao.procedimento?.duracao }}
-                  </p>
-                  <p>
-                    <strong>Local:</strong>
-                    Rua Minas Gerais, 141B - Sertanópolis/PR
-                  </p>
-                  <p v-if="solicitacao.observacao">
-                    <strong>Observação:</strong>
-                    {{ solicitacao.observacao }}
-                  </p>
-                </div>
-              </article>
-            </div>
-          </div>
-
-          <p v-else class="message">
-            Nenhuma solicitação antiga encontrada.
-          </p>
-        </section>
-
-        <section class="historico-section">
-          <h3 class="section-title">Histórico de agendamentos</h3>
-
+        <div class="historico-lista">
           <div
             v-if="historicoAgendamentos.length > 0"
-            class="cards-wrapper"
+            class="historico-cabecalho"
           >
-            <div class="cards">
-              <article
-                v-for="agendamento in historicoAgendamentos"
-                :key="agendamento.id"
-                class="request-card historico-card"
-              >
-                <div class="card-top">
-                  <h3>{{ agendamento.procedimento?.nome }}</h3>
-                  <span
-                    class="status"
-                    :class="classeStatusAgendamento(agendamento.status)"
-                  >
-                    {{ formatarStatusAgendamento(agendamento.status) }}
-                  </span>
-                </div>
-
-                <div class="info-list">
-                  <p>
-                    <strong>Data:</strong>
-                    {{ formatarData(agendamento.data) }}
-                  </p>
-                  <p>
-                    <strong>Horário:</strong>
-                    {{ agendamento.hora }}
-                  </p>
-                  <p>
-                    <strong>Duração:</strong>
-                    {{ agendamento.procedimento?.duracao }}
-                  </p>
-                  <p>
-                    <strong>Local:</strong>
-                    Rua Minas Gerais, 141B - Sertanópolis/PR
-                  </p>
-                  <p v-if="agendamento.observacao">
-                    <strong>Observação:</strong>
-                    {{ agendamento.observacao }}
-                  </p>
-                </div>
-              </article>
-            </div>
+            <span>Procedimento</span>
+            <span>Data</span>
+            <span>Horário</span>
           </div>
 
-          <p v-else class="message">
-            Nenhum agendamento antigo encontrado.
+          <div
+            v-for="agendamento in historicoAgendamentos"
+            :key="agendamento.id"
+            class="historico-item"
+          >
+            <span>{{ agendamento.procedimento?.nome }}</span>
+            <span>{{ formatarData(agendamento.data) }}</span>
+            <span>{{ agendamento.hora }}</span>
+          </div>
+
+          <p
+            v-if="historicoAgendamentos.length === 0"
+            class="historico-vazio"
+          >
+            Nenhum agendamento realizado anteriormente.
           </p>
-        </section>
+        </div>
+
+        <div class="modal-acoes">
+          <button
+            class="btn-cancelar"
+            @click="fecharHistorico"
+          >
+            Fechar
+          </button>
+        </div>
       </div>
     </div>
 
@@ -352,7 +288,6 @@ import { getUsuarioAutenticadoOuErro } from "@/services/authService";
 
 const solicitacoes = ref([]);
 const agendamentos = ref([]);
-const historicoSolicitacoes = ref([]);
 const historicoAgendamentos = ref([]);
 const carregando = ref(true);
 const carregandoHistorico = ref(false);
@@ -368,7 +303,7 @@ const toast = useToast();
 
 const solicitacoesAtivas = computed(() =>
   solicitacoes.value.filter(
-    s => !["RECUSADA", "CANCELADA"].includes(s.status)
+    s => s.status === "PENDENTE"
   )
 );
 
@@ -458,24 +393,17 @@ async function carregarAgendamentos() {
   }
 }
 
-async function carregarHistorico() {
-  if (mostrarHistorico.value) {
-    mostrarHistorico.value = false;
-    return;
-  }
-
+async function abrirHistorico() {
   const usuarioLogado = getUsuarioAutenticadoOuErro();
 
   try {
     carregandoHistorico.value = true;
 
-    const [solicitacoesResponse, agendamentosResponse] = await Promise.all([
-      api.get(`/solicitacoes/cliente/${usuarioLogado.id}/historico`),
-      api.get(`/agendamentos/cliente/${usuarioLogado.id}/historico`)
-    ]);
+    const response = await api.get(
+      `/agendamentos/cliente/${usuarioLogado.id}/historico`
+    );
 
-    historicoSolicitacoes.value = solicitacoesResponse.data;
-    historicoAgendamentos.value = agendamentosResponse.data;
+    historicoAgendamentos.value = response.data;
     mostrarHistorico.value = true;
   } catch (error) {
     console.error(error);
@@ -483,6 +411,10 @@ async function carregarHistorico() {
   } finally {
     carregandoHistorico.value = false;
   }
+}
+
+function fecharHistorico() {
+  mostrarHistorico.value = false;
 }
 
 async function cancelarSolicitacao(id) {
@@ -583,7 +515,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-
 h2 {
   margin: 0;
   font-size: 20px;
@@ -614,16 +545,15 @@ h2 {
 
 .cards-wrapper {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
   padding: 8px 4px 18px;
+  box-sizing: border-box;
 }
 
 .cards {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 28px;
-  width: max-content;
+  width: 100%;
 }
 
 .request-card {
@@ -727,12 +657,12 @@ h2 {
 }
 
 .danger-button {
-  background-color: #bb5151;
+  background-color: #c23030;
   color: #fff;
 }
 
 .danger-button:hover:not(:disabled) {
-  background: #933341;
+  background: #610a0a;
   color: white;
 }
 
@@ -768,27 +698,35 @@ h2 {
   opacity: 0.75;
 }
 
-.historico-button-container {
+.pagina-cabecalho {
+  margin-bottom: 28px;
   display: flex;
-  justify-content: center;
-  margin: 40px 0;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .historico-button {
   border: none;
-  border-radius: 26px;
-  min-width: 220px;
-  height: 50px;
-  padding: 0 28px;
-  background-color: #94335c;
+  border-radius: 10px;
+  padding: 12px 18px;
+  background-color: #dd81b5;
   color: #fff;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
+  transition:
+    background-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+  white-space: nowrap;
 }
 
 .historico-button:hover:not(:disabled) {
-  background-color: #7d284d;
+  background-color: #c9689e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .historico-button:disabled {
@@ -796,37 +734,185 @@ h2 {
   cursor: not-allowed;
 }
 
-.historico-content {
-  margin-top: 10px;
-  padding-top: 30px;
-  border-top: 1px solid #ddd;
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  z-index: 99999;
 }
 
-.historico-section {
-  margin-bottom: 50px;
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  box-sizing: border-box;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.historico-card {
-  border: 1px solid #ddd;
+.modal-historico {
+  width: 650px;
+  max-width: 90%;
 }
 
-.cards-wrapper::-webkit-scrollbar {
-  height: 10px;
+.modal-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #eee;
 }
 
-.cards-wrapper::-webkit-scrollbar-track {
+.modal-cabecalho h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+}
+
+.btn-fechar {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: #ffeeee;
+  color: #000;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.btn-fechar:hover {
+  background-color: #94335c;
+  color: #fff;
+}
+
+.historico-lista {
+  width: 100%;
+  max-height: 360px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  box-sizing: border-box;
+}
+
+.historico-cabecalho,
+.historico-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px 90px;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 12px;
+}
+
+.historico-cabecalho {
+  border: 1px solid #dd81b5;
+  border-bottom: 2px solid #dd81b5;
+  border-radius: 8px 8px 0 0;
+  background-color: #ffeeee;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.historico-item {
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #333;
+}
+
+.historico-item:last-child {
+  border-bottom: none;
+}
+
+.historico-item span {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.historico-item span:first-child {
+  font-weight: 600;
+  color: #000;
+}
+
+.historico-vazio {
+  margin: 30px 0;
+  text-align: center;
+  color: #777;
+  font-size: 15px;
+}
+
+.historico-lista::-webkit-scrollbar {
+  width: 8px;
+}
+
+.historico-lista::-webkit-scrollbar-track {
   background: #eeeeee;
   border-radius: 10px;
 }
 
-.cards-wrapper::-webkit-scrollbar-thumb {
+.historico-lista::-webkit-scrollbar-thumb {
   background: #94335c;
   border-radius: 10px;
 }
 
-.cards-wrapper::-webkit-scrollbar-thumb:hover {
+.historico-lista::-webkit-scrollbar-thumb:hover {
   background: #7d284d;
 }
+
+.modal-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #eee;
+}
+
+.btn-cancelar {
+  border: none;
+  border-radius: 26px;
+  min-width: 110px;
+  height: 46px;
+  padding: 0 22px;
+  background-color: #ffeeee;
+  color: #000;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.btn-cancelar:hover {
+  background-color: #94335c;
+  color: #fff;
+}
+
+/* Scroll da página */
 
 .solicitacoes-content::-webkit-scrollbar {
   width: 10px;
@@ -846,6 +932,38 @@ h2 {
   background: #7d284d;
 }
 
+/* Responsividade */
+
+@media (max-width: 700px) {
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal {
+    max-width: 100%;
+    max-height: 92vh;
+    padding: 22px;
+    border-radius: 18px;
+  }
+
+  .modal-historico {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .historico-cabecalho,
+  .historico-item {
+    grid-template-columns: minmax(0, 1fr) 90px 70px;
+    gap: 10px;
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+
+  .modal-cabecalho h2 {
+    font-size: 18px;
+  }
+}
+
 @media (max-width: 600px) {
   .request-card {
     flex-basis: 320px;
@@ -854,6 +972,15 @@ h2 {
 
   .cards {
     gap: 18px;
+  }
+
+  .pagina-cabecalho {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .historico-button {
+    align-self: flex-start;
   }
 }
 </style>

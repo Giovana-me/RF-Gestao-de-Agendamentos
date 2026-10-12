@@ -27,7 +27,10 @@
                 <input
                     type="text"
                     v-model="usuario.cpf"
-                >
+                    maxlength="14"
+                    inputmode="numeric"
+                    @input="formatarCpf"
+                />
             </div>
             <div class="campo">
                 <label>CEP</label>
@@ -192,21 +195,58 @@ async function carregarUsuario() {
         const dados = await buscarUsuarioPorId(usuarioLogado.id);
 
         usuario.value = {
-            ...dados,
-            endereco: dados.endereco ?? {
-                cep: "",
-                logradouro: "",
-                numero: "",
-                bairro: "",
-                cidade: "",
-                estado: ""
-            }
-        };
+        ...dados,
+        cpf: formatarCpfValor(dados.cpf ?? ""),
+        endereco: dados.endereco ?? {
+            cep: "",
+            logradouro: "",
+            numero: "",
+            bairro: "",
+            cidade: "",
+            estado: ""
+        }
+    };
 
     } catch (error) {
         console.error(error);
         toast.error("Não foi possível carregar os dados da conta.");
     }
+}
+
+function formatarCpf() {
+    let cpf = usuario.value.cpf.replace(/\D/g, "");
+
+    if (cpf.length > 11) {
+        cpf = cpf.substring(0, 11);
+    }
+
+    if (cpf.length > 9) {
+        cpf = cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, "$1.$2.$3-$4");
+    } else if (cpf.length > 6) {
+        cpf = cpf.replace(/^(\d{3})(\d{3})(\d{1,3})$/, "$1.$2.$3");
+    } else if (cpf.length > 3) {
+        cpf = cpf.replace(/^(\d{3})(\d{1,3})$/, "$1.$2");
+    }
+
+    usuario.value.cpf = cpf;
+}
+
+function formatarCpfValor(valor: string) {
+    let cpf = valor.replace(/\D/g, "").substring(0, 11);
+
+    if (cpf.length > 9) {
+        return cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, "$1.$2.$3-$4");
+    }
+
+    if (cpf.length > 6) {
+        return cpf.replace(/^(\d{3})(\d{3})(\d{1,3})$/, "$1.$2.$3");
+    }
+
+    if (cpf.length > 3) {
+        return cpf.replace(/^(\d{3})(\d{1,3})$/, "$1.$2");
+    }
+
+    return cpf;
 }
 
 async function consultarCep() {
@@ -262,7 +302,7 @@ function salvar() {
     emit("salvar", {
         nome: usuario.value.nome,
         telefone: usuario.value.telefone,
-        cpf: usuario.value.cpf,
+        cpf: usuario.value.cpf.replace(/\D/g, ''),
         endereco: usuario.value.endereco
     });
 }
@@ -326,14 +366,14 @@ watch(
 }
 
 .modal h2 {
-    font-size: 26px;
+    font-size: 20px;
     font-weight: 600;
     color: #000;
     padding-bottom: 20px;
 }
 
 .campo{
-    font-size: 18px;
+    font-size: 16px;
     color: rgb(63, 63, 63);
     display:flex;
     flex-direction:column;
@@ -346,7 +386,7 @@ input{
     border-radius:26px;
     height: 60px;
     border:1px solid #ccc;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .mensagem-erro{
@@ -389,24 +429,6 @@ input{
 .cancelar:hover {
     background:#94335c;
     color:white;
-}
-
-.modal-content::-webkit-scrollbar{
-    width:8px;
-}
-
-.modal-content::-webkit-scrollbar-track{
-    background:#f3f3f3;
-    border-radius:10px;
-}
-
-.modal-content::-webkit-scrollbar-thumb{
-    background:#dd81b5;
-    border-radius:10px;
-}
-
-.modal-content::-webkit-scrollbar-thumb:hover{
-    background:#94335c;
 }
 
 input[readonly] {
@@ -464,12 +486,3 @@ input[readonly] {
 }
 
 </style>
-
-/*width: 800px;
-    background:white;
-    border-radius:30px;
-    padding:30px;
-    max-height: 90vh; 
-    box-sizing: border-box;
-    display: flex; 
-    flex-direction: column;*/

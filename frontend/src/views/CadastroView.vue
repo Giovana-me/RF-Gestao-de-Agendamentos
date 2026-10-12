@@ -1,4 +1,3 @@
-```vue
 <template>
   <div class="cadastro-container">
     <div class="image-container">
@@ -68,7 +67,7 @@
               v-model="cpf"
               placeholder="Digite apenas números"
               inputmode="numeric"
-              maxlength="11"
+              maxlength="14"
               required
               @input="formatarCpf"
             />
@@ -134,15 +133,24 @@ function formatarTelefone(event: Event) {
 }
 
 function formatarCpf(event: Event) {
-  const input = event.target as HTMLInputElement
+    const input = event.target as HTMLInputElement
 
-  cpf.value = input.value.replace(/\D/g, '')
+    let valor = input.value.replace(/\D/g, "")
 
-  if (cpf.value.length > 11) {
-    cpf.value = cpf.value.substring(0, 11)
-  }
+    if (valor.length > 11) {
+        valor = valor.substring(0, 11)
+    }
 
-  validarCpf()
+    if (valor.length > 9) {
+        valor = valor.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, "$1.$2.$3-$4")
+    } else if (valor.length > 6) {
+        valor = valor.replace(/^(\d{3})(\d{3})(\d{1,3})$/, "$1.$2.$3")
+    } else if (valor.length > 3) {
+        valor = valor.replace(/^(\d{3})(\d{1,3})$/, "$1.$2")
+    }
+
+    cpf.value = valor
+    validarCpf()
 }
 
 function validarTelefone(): boolean {
@@ -166,23 +174,20 @@ function validarTelefone(): boolean {
 }
 
 function validarCpf(): boolean {
-  if (!cpf.value) {
-    erroCpf.value = 'O CPF é obrigatório.'
-    return false
-  }
+    if (!cpf.value) {
+        erroCpf.value = 'O CPF é obrigatório.'
+        return false
+    }
 
-  if (!/^\d+$/.test(cpf.value)) {
-    erroCpf.value = 'Digite apenas números.'
-    return false
-  }
+    const cpfNumeros = cpf.value.replace(/\D/g, '')
 
-  if (cpf.value.length !== 11) {
-    erroCpf.value = 'Informe um CPF válido com 11 números.'
-    return false
-  }
+    if (cpfNumeros.length !== 11) {
+        erroCpf.value = 'Informe um CPF válido com 11 números.'
+        return false
+    }
 
-  erroCpf.value = ''
-  return true
+    erroCpf.value = ''
+    return true
 }
 
 function validarEmail(): boolean {
@@ -237,7 +242,7 @@ async function realizarCadastro() {
       email: email.value.trim(),
       senha: senha.value,
       telefone: telefone.value,
-      cpf: cpf.value,
+      cpf: cpf.value.replace(/\D/g, '')
     })
 
     toast.success('Cadastro realizado com sucesso!')

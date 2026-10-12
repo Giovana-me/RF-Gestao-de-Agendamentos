@@ -14,7 +14,6 @@
         />
       </div>
 
-      <!-- MODAL DE DETALHES -->
       <div
         v-if="modalAberto && eventoSelecionado"
         class="agenda-modal-overlay"
@@ -260,6 +259,8 @@ const calendarOptions = ref<CalendarOptions>({
   initialView: 'timeGridWeek',
   locale: 'pt-br',
   firstDay: 0,
+  slotMinTime: '06:00:00',
+  slotMaxTime: '22:00:00',
   headerToolbar: {
     left: 'prev',
     center: 'title',

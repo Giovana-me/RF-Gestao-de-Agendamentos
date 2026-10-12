@@ -1,5 +1,5 @@
 import api from "./api";
-import type {Endereco} from "../interfaces/Endereco";
+import type { Endereco } from "../interfaces/Endereco";
 
 export interface AtualizarContaDTO {
     nome: string;
@@ -28,42 +28,79 @@ export async function atualizarUsuario(
     id: number,
     dados: AtualizarContaDTO
 ): Promise<Usuario> {
-
-    const response = await api.put<Usuario>(`/usuarios/${id}`, dados);
-
+    const response = await api.put<Usuario>(
+        `/usuarios/${id}`,
+        dados
+    );
     return response.data;
 }
 
-export interface AlterarEmailDTO {
+export interface SolicitarAlteracaoEmailDTO {
     novoEmail: string;
     senhaAtual: string;
 }
 
-export async function alterarEmail(
+export async function solicitarAlteracaoEmail(
     id: number,
-    dados: AlterarEmailDTO
-): Promise<Usuario> {
+    dados: SolicitarAlteracaoEmailDTO
+): Promise<void> {
+    await api.post(
+        `/usuarios/${id}/email/solicitar`,
+        dados
+    );
+}
 
-    const response = await api.put<Usuario>(
-        `/usuarios/${id}/email`,
+export interface ConfirmarAlteracaoEmailDTO {
+    codigo: string;
+}
+
+export interface ConfirmarAlteracaoEmailResponse {
+    id: number;
+    nome: string;
+    email: string;
+    telefone: string;
+    endereco: Endereco;
+    tipoUsuario: string;
+    token: string;
+}
+
+export async function confirmarAlteracaoEmail(
+    id: number,
+    dados: ConfirmarAlteracaoEmailDTO
+): Promise<ConfirmarAlteracaoEmailResponse> {
+    const response = await api.post<ConfirmarAlteracaoEmailResponse>(
+        `/usuarios/${id}/email/confirmar`,
         dados
     );
 
     return response.data;
 }
 
-export interface AlterarSenhaDTO {
+export interface SolicitarAlteracaoSenhaDTO {
     senhaAtual: string;
     novaSenha: string;
 }
 
-export async function alterarSenha(
+export async function solicitarAlteracaoSenha(
     id: number,
-    dados: AlterarSenhaDTO
+    dados: SolicitarAlteracaoSenhaDTO
 ): Promise<void> {
+    await api.post(
+        `/usuarios/${id}/senha/solicitar`,
+        dados
+    );
+}
 
-    await api.put(
-        `/usuarios/${id}/senha`,
+export interface ConfirmarAlteracaoSenhaDTO {
+    codigo: string;
+}
+
+export async function confirmarAlteracaoSenha(
+    id: number,
+    dados: ConfirmarAlteracaoSenhaDTO
+): Promise<void> {
+    await api.post(
+        `/usuarios/${id}/senha/confirmar`,
         dados
     );
 }

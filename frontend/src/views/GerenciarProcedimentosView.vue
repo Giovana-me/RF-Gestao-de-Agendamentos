@@ -1,17 +1,45 @@
 <template>
   <main class="procedimentos-admin">
     <div class="pagina-cabecalho">
-      <div>
-        <h1>Gerenciar Procedimentos</h1>
-        <p>
-          Visualize e gerencie os procedimentos oferecidos pela clínica.
-        </p>
-      </div>
+  <div>
+    <h1>Gerenciar Procedimentos</h1>
+    <p>
+      Visualize e gerencie os procedimentos oferecidos pela clínica.
+    </p>
+  </div>
 
-      <button class="btn-novo" @click="abrirModalNovo">
-        + Novo procedimento
+  <div class="cabecalho-acoes">
+    <div class="filtro-status">
+      <button
+        type="button"
+        :class="{ ativo: filtroStatus === 'ATIVOS' }"
+        @click="filtroStatus = 'ATIVOS'"
+      >
+        Ativos
+      </button>
+
+      <button
+        type="button"
+        :class="{ ativo: filtroStatus === 'INATIVOS' }"
+        @click="filtroStatus = 'INATIVOS'"
+      >
+        Inativos
+      </button>
+
+      <button
+        type="button"
+        :class="{ ativo: filtroStatus === 'TODOS' }"
+        @click="filtroStatus = 'TODOS'"
+      >
+        Todos
       </button>
     </div>
+
+    <button class="btn-novo" @click="abrirModalNovo">
+      + Novo procedimento
+    </button>
+  </div>
+</div>
 
     <section class="tabela-container">
       <table>
@@ -38,15 +66,15 @@
             </td>
         </tr>
 
-        <tr v-else-if="procedimentos.length === 0">
+        <tr v-else-if="procedimentosFiltrados.length === 0">
             <td colspan="5" class="mensagem-tabela">
-            Nenhum procedimento cadastrado.
+            Nenhum procedimento encontrado.
             </td>
         </tr>
 
         <tr
             v-else
-            v-for="procedimento in procedimentos"
+            v-for="procedimento in procedimentosFiltrados"
             :key="procedimento.id"
         >
             <td>{{ procedimento.nome }}</td>
@@ -229,7 +257,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import api from "@/services/api";
 import { useToast } from "vue-toastification";
 const toast = useToast();
@@ -237,6 +265,7 @@ const toast = useToast();
 const procedimentos = ref([]);
 const carregando = ref(false);
 const erro = ref("");
+const filtroStatus = ref("ATIVOS");
 const mostrarModal = ref(false);
 const salvando = ref(false);
 
@@ -252,6 +281,18 @@ const procedimentoEditandoId = ref(null);
 const mostrarConfirmacaoExclusao = ref(false);
 const procedimentoParaExcluir = ref(null);
 const excluindo = ref(false);
+
+const procedimentosFiltrados = computed(() => {
+  if (filtroStatus.value === "ATIVOS") {
+    return procedimentos.value.filter(procedimento => procedimento.ativo);
+  }
+
+  if (filtroStatus.value === "INATIVOS") {
+    return procedimentos.value.filter(procedimento => !procedimento.ativo);
+  }
+
+  return procedimentos.value;
+});
 
 function validarFormulario() {
   const nome = novoProcedimento.value.nome.trim();
@@ -518,7 +559,6 @@ onMounted(() => {
 .tabela-container table {
   width: 100%;
   border-collapse: collapse;
-  overflow: hidden;
   table-layout: fixed;
 }
 
@@ -533,11 +573,13 @@ onMounted(() => {
 }
 
 .tabela-container th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #ffeeee;
   color: #000;
-
   font-size: 15px;
   font-weight: 700;
-
   border-bottom: 2px solid #dd81b5;
 }
 
@@ -857,6 +899,45 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
+.cabecalho-acoes {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.filtro-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+}
+
+.filtro-status button {
+  border: none;
+  border-radius: 7px;
+  padding: 8px 12px;
+  background-color: transparent;
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.filtro-status button:hover {
+  background-color: #ffeeee;
+  color: #dd81b5;
+}
+
+.filtro-status button.ativo {
+  background-color: #dd81b5;
+  color: #fff;
+}
+
 @media (max-width: 900px) {
   .tabela-container table {
     min-width: 800px;
@@ -897,6 +978,24 @@ onMounted(() => {
   .modal {
     width: 90%;
     padding: 20px;
+  }
+
+  .cabecalho-acoes {
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  }
+
+  .filtro-status {
+    justify-content: center;
+  }
+
+  .filtro-status button {
+    flex: 1;
+  }
+
+  .btn-novo {
+    width: 100%;
   }
 }
 </style>

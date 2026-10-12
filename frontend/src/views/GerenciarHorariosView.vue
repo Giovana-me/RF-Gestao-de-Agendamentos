@@ -1,80 +1,92 @@
 <template>
-  <div class="horarios-admin">
+  <main class="horarios-admin">
     <div class="pagina-cabecalho">
       <div>
         <h1>Gerenciar Horários</h1>
-        <p>Cadastre e gerencie os horários de atendimento da clínica.</p>
+        <p>
+          Visualize e gerencie os horários de atendimento da clínica.
+        </p>
       </div>
+
       <button class="btn-novo" @click="abrirModal">
         + Novo horário
       </button>
     </div>
-    <div class="card-horarios">
 
-      <div v-if="carregando" class="mensagem">
-        Carregando horários...
-      </div>
+    <section class="tabela-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Horário</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
 
-      <div v-else-if="horarios.length === 0" class="mensagem">
-        Nenhum horário cadastrado.
-      </div>
+        <tbody>
+          <tr v-if="carregando">
+            <td colspan="2" class="mensagem-tabela">
+              Carregando horários...
+            </td>
+          </tr>
 
-      <div v-else class="lista-horarios">
+          <tr v-else-if="erro">
+            <td colspan="2" class="mensagem-tabela erro">
+              {{ erro }}
+            </td>
+          </tr>
 
-        <div
-          v-for="horario in horarios"
-          :key="horario.id"
-          class="horario-item"
-        >
-          <span class="hora">
-            {{ horario.hora }}
-          </span>
+          <tr v-else-if="horarios.length === 0">
+            <td colspan="2" class="mensagem-tabela">
+              Nenhum horário cadastrado.
+            </td>
+          </tr>
 
-          <button
-            class="btn-excluir"
-            @click="confirmarExclusao(horario)"
-            title="Excluir horário"
+          <tr
+            v-else
+            v-for="horario in horarios"
+            :key="horario.id"
           >
-            <Trash2 :size="18" />
-          </button>
-        </div>
+            <td>{{ horario.hora }}</td>
 
-      </div>
-    </div>
-    <div
-      v-if="mostrarModal"
-      class="modal-overlay"
-      @click.self="fecharModal"
-    >
+            <td>
+              <div class="acoes">
+                <button
+                  v-if="horario.ativo"
+                  class="btn-excluir"
+                  @click="confirmarExclusao(horario)"
+                >
+                  Excluir
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div v-if="mostrarModal" class="modal-overlay">
       <div class="modal">
-
-        <div class="modal-header">
+        <div class="modal-cabecalho">
           <h2>Novo horário</h2>
 
-          <button
-            class="btn-fechar"
-            @click="fecharModal"
-          >
+          <button class="btn-fechar" @click="fecharModal">
             ×
           </button>
         </div>
 
-        <div class="modal-body">
+        <div class="formulario">
+          <div class="campo">
+            <label for="horario">Horário</label>
 
-          <label for="hora">
-            Horário
-          </label>
-
-          <input
-            id="hora"
-            v-model="novoHorario"
-            type="time"
-          />
-
+            <input
+              id="horario"
+              v-model="novoHorario"
+              type="time"
+            />
+          </div>
         </div>
 
-        <div class="modal-footer">
-
+        <div class="modal-acoes">
           <button
             class="btn-cancelar"
             @click="fecharModal"
@@ -87,22 +99,20 @@
             @click="salvarHorario"
             :disabled="salvando"
           >
-            {{ salvando ? "Salvando..." : "Adicionar" }}
+            {{ salvando ? "Salvando..." : "Salvar" }}
           </button>
-
         </div>
-
       </div>
     </div>
+
     <div
-      v-if="mostrarConfirmacao"
+      v-if="mostrarConfirmacaoExclusao"
       class="modal-overlay"
-      @click.self="fecharConfirmacao"
     >
       <div class="modal modal-confirmacao">
-
-        <div class="modal-header">
+        <div class="modal-cabecalho">
           <h2>Excluir horário</h2>
+
           <button
             class="btn-fechar"
             @click="fecharConfirmacao"
@@ -111,20 +121,29 @@
           </button>
         </div>
 
-        <div class="modal-body">
+        <div class="confirmacao-conteudo">
           <p>
-            Deseja realmente excluir o horário
-            <strong>{{ horarioSelecionado?.hora }}</strong>?
+            Tem certeza que deseja excluir o horário
+            <strong>
+              {{ horarioParaExcluir?.hora }}
+            </strong>?
+          </p>
+
+          <p class="texto-aviso">
+            O horário deixará de ser disponibilizado
+            para novos agendamentos.
           </p>
         </div>
 
-        <div class="modal-footer">
+        <div class="modal-acoes">
           <button
             class="btn-cancelar"
             @click="fecharConfirmacao"
+            :disabled="excluindo"
           >
             Cancelar
           </button>
+
           <button
             class="btn-excluir-confirmar"
             @click="excluirHorario"
@@ -135,156 +154,132 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
-<script setup lang="ts">
-
+<script setup>
 import { onMounted, ref } from "vue";
 import api from "@/services/api";
 import { useToast } from "vue-toastification";
-import { Trash2 } from "lucide-vue-next";
-
-interface Horario {
-  id: number;
-  hora: string;
-  ativo: boolean;
-}
 
 const toast = useToast();
-const horarios = ref<Horario[]>([]);
+
+const horarios = ref([]);
 const carregando = ref(false);
-const salvando = ref(false);
-const excluindo = ref(false);
+const erro = ref("");
+
 const mostrarModal = ref(false);
-const mostrarConfirmacao = ref(false);
 const novoHorario = ref("");
-const horarioSelecionado = ref<Horario | null>(null);
+const salvando = ref(false);
+
+const mostrarConfirmacaoExclusao = ref(false);
+const horarioParaExcluir = ref(null);
+const excluindo = ref(false);
 
 async function carregarHorarios() {
   carregando.value = true;
+  erro.value = "";
 
   try {
     const response = await api.get("/horarios");
     horarios.value = response.data;
-
   } catch (error) {
     console.error("Erro ao carregar horários:", error);
-    toast.error(
-      "Não foi possível carregar os horários."
-    );
+    erro.value = "Não foi possível carregar os horários.";
   } finally {
     carregando.value = false;
-
   }
 }
 
 function abrirModal() {
   novoHorario.value = "";
   mostrarModal.value = true;
-
 }
 
 function fecharModal() {
-  if (salvando.value) {
-    return;
-  }
   mostrarModal.value = false;
-
+  novoHorario.value = "";
 }
 
 async function salvarHorario() {
   if (!novoHorario.value) {
-    toast.info(
-      "Selecione um horário para continuar."
-    );
+    toast.error("Informe um horário.");
     return;
   }
+
   salvando.value = true;
 
   try {
-
     await api.post("/horarios", {
       hora: novoHorario.value
     });
-    toast.success(
-      "Horário cadastrado com sucesso!"
-    );
+
+    toast.success("Horário cadastrado com sucesso.");
 
     fecharModal();
     await carregarHorarios();
+  } catch (error) {
+    console.error("Erro ao salvar horário:", error);
 
-  } catch (error: any) {
-    console.error("Erro ao cadastrar horário:", error);
-    const mensagem =
-      error.response?.data ||
-      "Não foi possível cadastrar o horário.";
-    toast.error(mensagem);
-
+    toast.error(
+      error.response?.data?.message ||
+      "Não foi possível cadastrar o horário."
+    );
   } finally {
     salvando.value = false;
   }
 }
 
-function confirmarExclusao(horario: Horario) {
-  horarioSelecionado.value = horario;
-  mostrarConfirmacao.value = true;
+function confirmarExclusao(horario) {
+  horarioParaExcluir.value = horario;
+  mostrarConfirmacaoExclusao.value = true;
 }
 
 function fecharConfirmacao() {
-
-  if (excluindo.value) {
-    return;
-  }
-  mostrarConfirmacao.value = false;
-  horarioSelecionado.value = null;
+  mostrarConfirmacaoExclusao.value = false;
+  horarioParaExcluir.value = null;
 }
 
-
 async function excluirHorario() {
-  if (!horarioSelecionado.value) {
+  if (!horarioParaExcluir.value) {
     return;
   }
-  excluindo.value = true;
-  try {
 
+  excluindo.value = true;
+
+  try {
     await api.patch(
-      `/horarios/${horarioSelecionado.value.id}/desativar`
-    );
-    toast.success(
-      "Horário excluído com sucesso!"
+      `/horarios/${horarioParaExcluir.value.id}/desativar`
     );
 
     fecharConfirmacao();
     await carregarHorarios();
-  } catch (error: any) {
 
+    toast.success("Horário excluído com sucesso.");
+  } catch (error) {
     console.error("Erro ao excluir horário:", error);
 
-    const mensagem =
-      error.response?.data ||
-      "Não foi possível excluir o horário.";
-
-    toast.error(mensagem);
-
+    toast.error(
+      "Não foi possível excluir o horário."
+    );
   } finally {
     excluindo.value = false;
-
   }
 }
 
 onMounted(() => {
   carregarHorarios();
 });
-
 </script>
 
 <style scoped>
-
-.gerenciar-horarios {
-  position: relative;
-  z-index: 10;
+.horarios-admin {
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .pagina-cabecalho {
@@ -293,6 +288,7 @@ onMounted(() => {
   align-items: flex-end;
   justify-content: space-between;
   gap: 20px;
+  flex-shrink: 0;
 }
 
 .pagina-cabecalho h1 {
@@ -317,7 +313,6 @@ onMounted(() => {
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-
   transition:
     background-color 0.2s,
     transform 0.2s,
@@ -330,87 +325,111 @@ onMounted(() => {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.card-horarios {
+.tabela-container {
   width: 100%;
-  box-sizing: border-box;
-  padding: 26px;
-  border-radius: 26px;
-  background-color: #fff;
-}
-
-.lista-horarios {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-
-.horario-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 64px;
-  padding: 12px 14px;
-  box-sizing: border-box;
-  border: 1px solid #eee;
-  border-radius: 26px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: auto;
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.22);
-  transition:
-    background-color 0.2s,
-    border-color 0.2s,
-    box-shadow 0.2s,
-    transform 0.2s;
 }
 
-.horario-item:hover {
-  background-color: white;
-  box-shadow:
-    0 8px 14px rgba(0, 0, 0, 0.24),
-    inset 0 3px 5px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
+.tabela-container table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.hora {
+.tabela-container th,
+.tabela-container td {
+  padding: 18px 20px;
+  text-align: left;
+}
+
+.tabela-container thead {
+  background-color: #ffeeee;
+}
+
+.tabela-container th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #ffeeee;
+  color: #000;
+  font-size: 15px;
+  font-weight: 700;
+  border-bottom: 2px solid #dd81b5;
+}
+
+.tabela-container td {
+  color: #333;
+  font-size: 15px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.tabela-container tbody tr {
+  transition: background-color 0.2s;
+}
+
+.tabela-container tbody tr:hover {
+  background-color: #fff8fb;
+}
+
+.tabela-container tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabela-container th:nth-child(1),
+.tabela-container td:nth-child(1) {
+  width: 50%;
+  font-weight: 600;
+  color: #000;
+}
+
+.tabela-container th:nth-child(2),
+.tabela-container td:nth-child(2) {
+  width: 50%;
+  text-align: center;
+}
+
+.acoes {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 90px;
-  padding: 9px 14px;
-  border-radius: 20px;
-  background-color: #ffeeee;
-  color: #dd81b5;
-  font-size: 16px;
-  font-weight: 700;
+  gap: 8px;
 }
 
 .btn-excluir {
-  width: 36px;
-  height: 36px;
   border: none;
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #fcecec;
-  color: #c62828;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   transition:
     background-color 0.2s,
     color 0.2s,
     transform 0.2s;
+  background-color: #fcecec;
+  color: #c62828;
 }
 
 .btn-excluir:hover {
   background-color: #c62828;
   color: #fff;
-  transform: translateY(-1px);
 }
 
-.mensagem {
-  text-align: center;
-  padding: 30px;
-  color: #777;
-  font-size: 15px;
+.mensagem-tabela {
+  text-align: center !important;
+  padding: 30px !important;
+  color: #777 !important;
+  font-size: 15px !important;
+}
+
+.mensagem-tabela.erro {
+  color: #94335c !important;
 }
 
 .modal-overlay {
@@ -430,17 +449,16 @@ onMounted(() => {
   border-radius: 18px;
   padding: 26px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-  box-sizing: border-box;
 }
 
-.modal-header {
+.modal-cabecalho {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
 }
 
-.modal-header h2 {
+.modal-cabecalho h2 {
   margin: 0;
   font-size: 20px;
   font-weight: 700;
@@ -469,19 +487,25 @@ onMounted(() => {
   color: #fff;
 }
 
-.modal-body {
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.campo {
   display: flex;
   flex-direction: column;
   gap: 7px;
 }
 
-.modal-body label {
+.campo label {
   font-size: 14px;
   font-weight: 600;
   color: #333;
 }
 
-.modal-body input {
+.campo input {
   width: 100%;
   box-sizing: border-box;
   padding: 11px 13px;
@@ -497,19 +521,19 @@ onMounted(() => {
     box-shadow 0.2s;
 }
 
-.modal-body input:focus {
+.campo input:focus {
   border-color: #dd81b5;
   box-shadow: 0 0 0 2px rgba(221, 129, 181, 0.12);
 }
 
-.modal-footer {
+.modal-acoes {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 26px;
 }
 
-.modal-footer button {
+.modal-acoes button {
   border: none;
   border-radius: 8px;
   padding: 10px 18px;
@@ -523,7 +547,6 @@ onMounted(() => {
 
 .btn-cancelar {
   background-color: #eeeeee;
-
   color: #555;
 }
 
@@ -578,24 +601,17 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-.modal-body p {
-  margin: 0 0 12px;
-  font-size: 15px;
-  color: black !important;
-}
-
 @media (max-width: 900px) {
-  .lista-horarios {
-    grid-template-columns: repeat(3, 1fr);
+  .tabela-container table {
+    min-width: 600px;
   }
-}
 
-@media (max-width: 700px) {
+  .tabela-container {
+    overflow-x: auto;
+  }
+
   .pagina-cabecalho {
     align-items: flex-start;
-  }
-  .lista-horarios {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -604,19 +620,23 @@ onMounted(() => {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .btn-novo {
     width: 100%;
   }
-  .card-horarios {
-    padding: 20px;
+
+  .tabela-container table {
+    min-width: 550px;
   }
-  .lista-horarios {
-    grid-template-columns: 1fr;
+
+  .tabela-container th,
+  .tabela-container td {
+    padding: 14px 16px;
   }
+
   .modal {
     width: 90%;
     padding: 20px;
   }
 }
-
 </style>
